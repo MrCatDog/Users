@@ -4,9 +4,12 @@
     <string name="user_age_precurse">age:</string>
     <string name="user_eye_color_precurse">Eye color:</string>
     <string name="user_eye_color_content_description">User eye color</string>
+
     <string name="user_fav_fruit_banana">&#127820;</string>
     <string name="user_fav_fruit_apple">&#127823;</string>
     <string name="user_fav_fruit_strawberry">&#127827;</string>
+    <string name="user_fav_fruit_unknown">&#129335;</string>
+
     <string name="user_registered_precurse_text">Registered:</string>
     <string name="user_lat_lon_precurse_text">Location:</string>
     <string name="user_fav_fruit_precusre_text">Favorit fruit:</string>

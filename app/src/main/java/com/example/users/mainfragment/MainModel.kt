@@ -2,6 +2,18 @@ package com.example.users.mainfragment
 
 import java.util.*
 
+enum class FavFruit {
+    STRAWBERRY,
+    APPLE,
+    BANANA
+}
+
+data class BaseUserInfo(
+    val name: String,
+    val email: String,
+    val isActive: Boolean
+)
+
 data class FullUserInfo(
     val id: Int,
     val baseUserInfo: BaseUserInfo,
@@ -10,15 +22,10 @@ data class FullUserInfo(
     val company: String,
     val address: String,
     val about: String,
-    val favoriteFruit: String, //todo enum?
+    val favoriteFruit: FavFruit,
     val registered: Date,
     val lat: Float,
     val lon: Float,
     val friends: List<Int>
 )
 
-data class BaseUserInfo(
-    val name: String,
-    val email: String,
-    val isActive: Boolean
-)
