@@ -31,6 +31,10 @@ class MainFragment : Fragment() {
         binding.usersList.layoutManager = linearLayoutManager
         binding.usersList.adapter = recyclerAdapter
 
+        binding.refreshBtn.setOnClickListener {
+            viewModel.refreshBtnClicked()
+        }
+
         return binding.root
     }
 
