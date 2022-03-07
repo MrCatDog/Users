@@ -10,4 +10,8 @@
 
     <color name="users_list_isActive_false">#FF0000</color>
     <color name="users_list_isActive_true">#00FF00</color>
+
+    <color name="user_eye_color_brown">#964B00</color>
+    <color name="user_eye_color_green">#6CA580</color>
+    <color name="user_eye_color_blue">#85ABCE</color>
 </resources>

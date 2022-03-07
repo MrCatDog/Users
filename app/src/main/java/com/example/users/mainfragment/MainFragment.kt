@@ -26,10 +26,31 @@ class MainFragment : Fragment() {
     ): View {
         _binding = MainFragmentBinding.inflate(inflater)
         val linearLayoutManager = LinearLayoutManager(context)
-        val recyclerAdapter = RecyclerAdapter()
+        val recyclerAdapter = RecyclerAdapter(this)
 
         binding.usersList.layoutManager = linearLayoutManager
         binding.usersList.adapter = recyclerAdapter
+
+        viewModel.isLoading.observe(viewLifecycleOwner) {
+            binding.progressbar.visibility =
+                if (it) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
+        }
+
+        viewModel.selectedUser.observe(viewLifecycleOwner) {
+            //todo dataBinding
+        }
+
+        viewModel.users.observe(viewLifecycleOwner) {
+            recyclerAdapter.setData(it)
+        }
+
+        viewModel.errorText.observe(viewLifecycleOwner) {
+            //todo кинуть снэк
+        }
 
         binding.refreshBtn.setOnClickListener {
             viewModel.refreshBtnClicked()
@@ -41,6 +62,10 @@ class MainFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    fun onListItemClicked(item: BaseUserInfo) {
+        viewModel.listItemClicked(item)
     }
 
 }

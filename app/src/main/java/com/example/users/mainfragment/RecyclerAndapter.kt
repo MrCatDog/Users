@@ -1,5 +1,6 @@
 package com.example.users.mainfragment
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +10,7 @@ import com.example.users.R
 import com.example.users.databinding.UsersListItemBinding
 import java.util.ArrayList
 
-class RecyclerAdapter : RecyclerView.Adapter<VH>() {
+class RecyclerAdapter(private val listener: MainFragment) : RecyclerView.Adapter<VH>() {
     class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val binding = UsersListItemBinding.bind(itemView)
     }
@@ -39,12 +40,16 @@ class RecyclerAdapter : RecyclerView.Adapter<VH>() {
             }
         }
 
+        holder.binding.root.setOnClickListener {
+            listener.onListItemClicked(item)
+        }
     }
 
     override fun getItemCount() = items.size
 
-    fun setData(items: List<BaseUserInfo>, itemCount: Int) {
+    @SuppressLint("NotifyDataSetChanged") //all of them changed
+    fun setData(items: List<BaseUserInfo>) {
         this.items = items
-        notifyItemRangeInserted(items.lastIndex, itemCount)
+        notifyDataSetChanged()
     }
 }
