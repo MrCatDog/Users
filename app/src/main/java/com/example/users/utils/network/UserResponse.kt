@@ -14,6 +14,10 @@ data class UserResponse(
     val registered: String,
     val latitude: Float,
     val longitude: Float,
-    val friends: List<Int>,
+    val friends: List<FriendsResponse>, //todo List?
     val favoriteFruit: String
+)
+
+data class FriendsResponse(
+    val id: Int
 )

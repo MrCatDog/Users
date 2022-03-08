@@ -12,9 +12,11 @@
 
     <string name="user_registered_precurse_text">Registered:</string>
     <string name="user_lat_lon_precurse_text">Location:</string>
-    <string name="user_fav_fruit_precusre_text">Favorit fruit:</string>
+    <string name="user_fav_fruit_precusre_text">Favorite fruit:</string>
 
-    <string name="users_list_isActive_true">"Active"</string>
-    <string name="users_list_isActive_false">"Not active"</string>
+    <string name="user_lat_lon_placeholder_with_delimiter">%1$f %2$f</string>
+
+    <string name="users_list_isActive_true">Active</string>
+    <string name="users_list_isActive_false">Not active</string>
     <string name="refresh_btn_text">Refresh</string>
 </resources>

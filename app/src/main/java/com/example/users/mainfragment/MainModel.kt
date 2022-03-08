@@ -12,16 +12,17 @@ data class FullUserInfo(
     val age: Int,
     val eyeColor: Int,
     val company: String,
+    val phone: String,
     val address: String,
     val about: String,
     val favoriteFruit: Int,
     val registeredDate: String,
     val lat: Float,
     val lon: Float,
-    val friends: List<Int>
+    val friends: Set<Int>
 )
 
 class MainModel {
-    val items = ArrayList<FullUserInfo>()
+    var items = ArrayList<FullUserInfo>()
 }
 

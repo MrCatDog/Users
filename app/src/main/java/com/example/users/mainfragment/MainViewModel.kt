@@ -10,9 +10,8 @@ import com.example.users.utils.network.UserResponse
 import retrofit2.Call
 import retrofit2.Response
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.collections.ArrayList
 
 class MainViewModel : ViewModel() {
 
@@ -35,6 +34,8 @@ class MainViewModel : ViewModel() {
         get() = _errorText
 
     private val model = MainModel()
+
+    private val userBackstack = ArrayDeque<Int>()
 
     init {
         //todo проверить базу на существование если нет, грузим
@@ -71,6 +72,7 @@ class MainViewModel : ViewModel() {
                         else -> R.color.white
                     },
                     company = it.company,
+                    phone = it.phone,
                     address = it.address,
                     about = it.about,
                     favoriteFruit = when (it.favoriteFruit) {
@@ -80,18 +82,14 @@ class MainViewModel : ViewModel() {
                         else -> R.string.user_fav_fruit_unknown
                     },
                     registeredDate = transformDate(it.registered),
-//                    LocalDate.parse(
-//                        "14-02-2018",
-//                        DateTimeFormatter.ofPattern("dd-MM-yyyy")
-//                    ).toString(),
                     lat = it.latitude,
                     lon = it.longitude,
-                    friends = it.friends
+                    friends = it.friends.map {friend -> friend.id}.toSet()
                 )
             }
             if (users != null) {
-                    model.items.addAll(users)
-                _users.postValue(model.items.map {it.baseUserInfo})
+                model.items = users as ArrayList<FullUserInfo>
+                _users.postValue(resetUsers())
             } else {
                 _errorText.postValue(response.errorBody().toString())
             }
@@ -105,7 +103,7 @@ class MainViewModel : ViewModel() {
         loadUsers()
     }
 
-    fun transformDate(textDate: String): String {
+    private fun transformDate(textDate: String): String {
         val date: Date? = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss Z", Locale.US).parse(textDate)
         return SimpleDateFormat("HH:mm dd.MM.yy", Locale.getDefault()).format(
             date ?: ""
@@ -115,9 +113,28 @@ class MainViewModel : ViewModel() {
     }
 
     fun listItemClicked(item: BaseUserInfo) {
-        if(item.isActive) {
-            _selectedUser.value = model.items.first {it.baseUserInfo.id == item.id}
+        if (item.isActive) {
+            val fullItemInfo = model.items.find { it.baseUserInfo.id == item.id }
+            _selectedUser.value = fullItemInfo
+            _users.value = resetUsers()
+            _selectedUser.value.let {
+                userBackstack.push(it.baseUserInfo.id) //todo какого хуя, ты же внутри let
+                //todo нужен возврат на главный экран
+            }
         }
     }
 
+    private fun resetUsers() =
+        model.items.filter { selectedUser.value?.friends?.contains(it.baseUserInfo.id) ?: true }
+            .map { it.baseUserInfo }
+    //todo ересь какая проверить и название
+
+    private fun backBtnPressed() {
+        if(!userBackstack.isEmpty()) {
+            _selectedUser.value = model.items.find {it.baseUserInfo.id == userBackstack.pop()}
+        } else {
+
+        }
+
+    }
 }

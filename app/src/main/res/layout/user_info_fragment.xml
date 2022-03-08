@@ -28,6 +28,7 @@
         android:id="@+id/user_age"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingStart="@dimen/common_padding_from_precurse"
         app:layout_constraintBottom_toBottomOf="@id/user_name_age_barrier"
         app:layout_constraintLeft_toRightOf="@id/user_age_precurse"
         app:layout_constraintRight_toRightOf="parent"
@@ -76,43 +77,44 @@
         android:text="@string/user_eye_color_precurse"
         app:layout_constraintBottom_toTopOf="@id/user_eye_color_fruit_barrier"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/user_phone"
         app:layout_constraintRight_toLeftOf="@id/user_eye_color"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/user_phone" />
 
     <ImageView
         android:id="@+id/user_eye_color"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/user_eye_color_content_description"
+        android:paddingStart="@dimen/common_padding_from_precurse"
         android:src="@drawable/user_eye_color_drawable"
         app:layout_constraintBottom_toTopOf="@id/user_eye_color_fruit_barrier"
         app:layout_constraintLeft_toRightOf="@id/user_eye_color_precurse"
         app:layout_constraintRight_toLeftOf="@id/user_fav_fruit_precurse"
-        app:layout_constraintTop_toBottomOf="@id/user_phone"
-        app:layout_constraintStart_toEndOf="@id/user_eye_color_precurse" />
+        app:layout_constraintStart_toEndOf="@id/user_eye_color_precurse"
+        app:layout_constraintTop_toBottomOf="@id/user_phone" />
 
     <TextView
         android:id="@+id/user_fav_fruit_precurse"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="@string/user_fav_fruit_precusre_text"
         app:layout_constraintBottom_toTopOf="@id/user_eye_color_fruit_barrier"
+        app:layout_constraintEnd_toStartOf="@id/user_fav_fruit"
         app:layout_constraintLeft_toRightOf="@id/user_eye_color"
         app:layout_constraintRight_toLeftOf="@id/user_fav_fruit"
-        app:layout_constraintTop_toBottomOf="@id/user_phone"
-        android:text="@string/user_fav_fruit_precusre_text"
-        app:layout_constraintEnd_toStartOf="@id/user_fav_fruit"
-        />
+        app:layout_constraintTop_toBottomOf="@id/user_phone" />
 
     <TextView
         android:id="@+id/user_fav_fruit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingStart="@dimen/common_padding_from_precurse"
         app:layout_constraintBottom_toTopOf="@id/user_eye_color_fruit_barrier"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintLeft_toRightOf="@id/user_fav_fruit_precurse"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/user_phone"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@id/user_phone" />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/user_eye_color_fruit_barrier"
@@ -136,6 +138,7 @@
         android:id="@+id/user_registered"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:paddingStart="@dimen/common_padding_from_precurse"
         app:layout_constraintBottom_toTopOf="@id/user_registered_barrier"
         app:layout_constraintLeft_toRightOf="@id/user_registered_precurse"
         app:layout_constraintRight_toRightOf="parent"
@@ -163,6 +166,7 @@
         android:id="@+id/user_lat_lon"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:paddingStart="@dimen/common_padding_from_precurse"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@id/user_lat_lon_precurse"
         app:layout_constraintRight_toRightOf="parent"

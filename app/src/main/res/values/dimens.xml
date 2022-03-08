@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="common_padding_from_precurse">5dp</dimen>
+    <dimen name="user_eye_color_drawable_size">10dp</dimen>
+</resources>
