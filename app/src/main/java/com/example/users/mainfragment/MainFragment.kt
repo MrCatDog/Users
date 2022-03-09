@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.users.R
 import com.example.users.databinding.MainFragmentBinding
 import com.example.users.utils.viewModelsExt
+import com.google.android.material.snackbar.Snackbar
 
 class MainFragment : Fragment() {
 
@@ -50,18 +51,21 @@ class MainFragment : Fragment() {
         }
 
         viewModel.selectedUser.observe(viewLifecycleOwner) {
-                binding.userInfo.apply {
-                    this.userName.text = it.baseUserInfo.name
-                    this.userAge.text = it.age.toString()
-                    this.userCompany.text = it.company
-                    this.userEmail.text = it.baseUserInfo.email
-                    this.userFavFruit.text = getString(it.favoriteFruit)
-                    this.userPhone.text = it.phone
-                    this.userRegistered.text = it.registeredDate
-                    this.userLatLon.text =
-                        getString(R.string.user_lat_lon_placeholder_with_delimiter, it.lat, it.lon)
-                    ImageViewCompat.setImageTintList(this.userEyeColor, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), it.eyeColor)))
-                }
+            binding.userInfo.apply {
+                this.userName.text = it.baseUserInfo.name
+                this.userAge.text = it.age.toString()
+                this.userCompany.text = it.company
+                this.userEmail.text = it.baseUserInfo.email
+                this.userFavFruit.text = getString(it.favoriteFruit)
+                this.userPhone.text = it.phone
+                this.userRegistered.text = it.registeredDate
+                this.userLatLon.text =
+                    getString(R.string.user_lat_lon_placeholder_with_delimiter, it.lat, it.lon)
+                ImageViewCompat.setImageTintList(
+                    this.userEyeColor,
+                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(), it.eyeColor))
+                )
+            }
         }
 
         viewModel.users.observe(viewLifecycleOwner) {
@@ -69,7 +73,12 @@ class MainFragment : Fragment() {
         }
 
         viewModel.errorText.observe(viewLifecycleOwner) {
-            //todo кинуть снэк
+            Snackbar.make(
+                binding.usersList,
+                it ?: getString(R.string.unknown_error_text),
+                Snackbar.LENGTH_LONG
+            )
+                .show()
         }
 
         binding.refreshBtn.setOnClickListener {

@@ -19,4 +19,6 @@
     <string name="users_list_isActive_true">Active</string>
     <string name="users_list_isActive_false">Not active</string>
     <string name="refresh_btn_text">Refresh</string>
+
+    <string name="unknown_error_text">Unknown error!</string>
 </resources>

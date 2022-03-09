@@ -1,5 +1,7 @@
 package com.example.users.mainfragment
 
+import androidx.room.Entity
+
 data class BaseUserInfo(
     val id: Int,
     val name: String,
@@ -7,7 +9,9 @@ data class BaseUserInfo(
     val isActive: Boolean
 )
 
+@Entity(tableName = "users_info")
 data class FullUserInfo(
+    
     val baseUserInfo: BaseUserInfo,
     val age: Int,
     val eyeColor: Int,
