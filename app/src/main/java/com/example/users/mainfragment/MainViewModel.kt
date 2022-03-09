@@ -9,9 +9,13 @@ import com.example.users.utils.network.DataReceiver
 import com.example.users.utils.network.UserResponse
 import retrofit2.Call
 import retrofit2.Response
+import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+
+const val PARSE_DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss Z"
+const val FORMAT_DATE_PATTERN = "HH:mm dd.MM.yy"
 
 class MainViewModel : ViewModel() {
 
@@ -21,8 +25,8 @@ class MainViewModel : ViewModel() {
     val users: LiveData<List<BaseUserInfo>>
         get() = _users
 
-    private val _selectedUser = MutableLiveData<FullUserInfo?>()
-    val selectedUser: LiveData<FullUserInfo?>
+    private val _selectedUser = MutableLiveData<FullUserInfo>()
+    val selectedUser: LiveData<FullUserInfo>
         get() = _selectedUser
 
     private val _isLoading = MutableLiveData<Boolean>()
@@ -33,8 +37,11 @@ class MainViewModel : ViewModel() {
     val errorText: LiveData<String?>
         get() = _errorText
 
-    private val model = MainModel()
+    private val _isUserVisible = MutableLiveData<Boolean>()
+    val isUserVisible: LiveData<Boolean>
+        get() = _isUserVisible
 
+    private val model = MainModel()
     private val userBackstack = ArrayDeque<Int>()
 
     init {
@@ -45,13 +52,7 @@ class MainViewModel : ViewModel() {
     private fun loadUsers() {
         _isLoading.value = true
         dataReceiver.requestUsers(this::onMainResponse, this::onMainFailure)
-    }
-
-    private fun onMainFailure(call: Call<List<UserResponse>>, e: Throwable) {
-        if (!call.isCanceled) {
-            _errorText.postValue(e.message)
-            _isLoading.value = false
-        }
+        _isLoading.value = false
     }
 
     private fun onMainResponse(response: Response<List<UserResponse>>) {
@@ -84,57 +85,74 @@ class MainViewModel : ViewModel() {
                     registeredDate = transformDate(it.registered),
                     lat = it.latitude,
                     lon = it.longitude,
-                    friends = it.friends.map {friend -> friend.id}.toSet()
+                    friends = it.friends.map { friend -> friend.id }.toSet()
                 )
             }
             if (users != null) {
                 model.items = users as ArrayList<FullUserInfo>
-                _users.postValue(resetUsers())
+                formNewUsersList()
             } else {
                 _errorText.postValue(response.errorBody().toString())
             }
         } else {
             _errorText.postValue(response.errorBody().toString())
         }
-        _isLoading.value = false
     }
+
+    private fun onMainFailure(call: Call<List<UserResponse>>, e: Throwable) {
+        if (!call.isCanceled) {
+            _errorText.postValue(e.message)
+        }
+    }
+
+    private fun transformDate(textDate: String) = formatDate(
+        try {
+            parseDate(textDate)!! // "In case of error, returns null." but in case of error i go into the catch block :\
+        } catch (ex: Exception) {
+            _errorText.postValue(ex.message)
+            Calendar.getInstance().time
+        }
+    )
+
+    private fun parseDate(textDate: String) =
+        SimpleDateFormat(PARSE_DATE_PATTERN, Locale.US).parse(textDate)
+
+    private fun formatDate(date: Date) =
+        SimpleDateFormat(FORMAT_DATE_PATTERN, Locale.getDefault()).format(date).toString()
 
     fun refreshBtnClicked() {
         loadUsers()
     }
 
-    private fun transformDate(textDate: String): String {
-        val date: Date? = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss Z", Locale.US).parse(textDate)
-        return SimpleDateFormat("HH:mm dd.MM.yy", Locale.getDefault()).format(
-            date ?: ""
-        ).toString()
-
-        //todo проверить работу этой штуки
-    }
-
     fun listItemClicked(item: BaseUserInfo) {
         if (item.isActive) {
-            val fullItemInfo = model.items.find { it.baseUserInfo.id == item.id }
-            _selectedUser.value = fullItemInfo
-            _users.value = resetUsers()
-            _selectedUser.value.let {
-                userBackstack.push(it.baseUserInfo.id) //todo какого хуя, ты же внутри let
-                //todo нужен возврат на главный экран
+            if(_isUserVisible.value == true) {
+                userBackstack.push(_selectedUser.value?.baseUserInfo?.id)
             }
+            _selectedUser.value = findFullUserInfoById(item.id)
+            _isUserVisible.value = true
+            formNewUsersList()
         }
     }
 
-    private fun resetUsers() =
-        model.items.filter { selectedUser.value?.friends?.contains(it.baseUserInfo.id) ?: true }
-            .map { it.baseUserInfo }
-    //todo ересь какая проверить и название
+    private fun findFullUserInfoById(id: Int) = model.items.find { it.baseUserInfo.id == id }
 
-    private fun backBtnPressed() {
-        if(!userBackstack.isEmpty()) {
-            _selectedUser.value = model.items.find {it.baseUserInfo.id == userBackstack.pop()}
+    private fun formNewUsersList() {
+        _users.value =
+            if (_isUserVisible.value == true) {
+                model.items.filter { selectedUser.value!!.friends.contains(it.baseUserInfo.id) } //todo проверить !!
+                    .map { it.baseUserInfo }
+            } else {
+                model.items.map { it.baseUserInfo }
+            }
+    }
+
+    fun backBtnPressed() {
+        if(userBackstack.isEmpty()) {
+            _isUserVisible.value = false
         } else {
-
+            _selectedUser.value = findFullUserInfoById(userBackstack.pop())
         }
-
+        formNewUsersList()
     }
 }

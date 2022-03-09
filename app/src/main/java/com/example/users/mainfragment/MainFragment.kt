@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.Fragment
@@ -35,6 +36,10 @@ class MainFragment : Fragment() {
         binding.usersList.layoutManager = linearLayoutManager
         binding.usersList.adapter = recyclerAdapter
 
+        val callback = requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            viewModel.backBtnPressed()
+        }
+
         viewModel.isLoading.observe(viewLifecycleOwner) {
             binding.progressbar.visibility =
                 if (it) {
@@ -45,10 +50,6 @@ class MainFragment : Fragment() {
         }
 
         viewModel.selectedUser.observe(viewLifecycleOwner) {
-            //todo dataBinding и проверить
-            binding.userInfo.root.visibility = if (it == null) {
-                View.GONE
-            } else {
                 binding.userInfo.apply {
                     this.userName.text = it.baseUserInfo.name
                     this.userAge.text = it.age.toString()
@@ -61,8 +62,6 @@ class MainFragment : Fragment() {
                         getString(R.string.user_lat_lon_placeholder_with_delimiter, it.lat, it.lon)
                     ImageViewCompat.setImageTintList(this.userEyeColor, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), it.eyeColor)))
                 }
-                View.VISIBLE
-            }
         }
 
         viewModel.users.observe(viewLifecycleOwner) {
@@ -75,6 +74,16 @@ class MainFragment : Fragment() {
 
         binding.refreshBtn.setOnClickListener {
             viewModel.refreshBtnClicked()
+        }
+
+        viewModel.isUserVisible.observe(viewLifecycleOwner) {
+            binding.userInfo.root.visibility = if (it) {
+                callback.isEnabled = it
+                View.VISIBLE
+            } else {
+                callback.isEnabled = it
+                View.GONE
+            }
         }
 
         return binding.root
