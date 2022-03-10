@@ -1,19 +1,24 @@
 package com.example.users.mainfragment
 
+import android.content.Intent
 import android.content.res.ColorStateList
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.users.R
 import com.example.users.databinding.MainFragmentBinding
 import com.example.users.utils.viewModelsExt
 import com.google.android.material.snackbar.Snackbar
+
 
 class MainFragment : Fragment() {
 
@@ -24,6 +29,7 @@ class MainFragment : Fragment() {
     private val viewModel by viewModelsExt {
         MainViewModel()
     }
+    private val recyclerAdapter = RecyclerAdapter(this)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,14 +37,15 @@ class MainFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = MainFragmentBinding.inflate(inflater)
-        val linearLayoutManager = LinearLayoutManager(context)
-        val recyclerAdapter = RecyclerAdapter(this)
 
-        binding.usersList.layoutManager = linearLayoutManager
-        binding.usersList.adapter = recyclerAdapter
+        assembleRecyclerView()
 
         val callback = requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             viewModel.backBtnPressed()
+        }
+
+        binding.refreshBtn.setOnClickListener {
+            viewModel.refreshBtnClicked()
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner) {
@@ -52,20 +59,19 @@ class MainFragment : Fragment() {
 
         viewModel.selectedUser.observe(viewLifecycleOwner) {
             binding.userInfo.apply {
-                this.userName.text = it.baseUserInfo.name
-                this.userAge.text = it.age.toString()
-                this.userCompany.text = it.company
-                this.userEmail.text = it.baseUserInfo.email
-                this.userFavFruit.text = getString(it.favoriteFruit)
-                this.userPhone.text = it.phone
-                this.userRegistered.text = it.registeredDate
-                this.userLatLon.text =
+                userName.text = it.baseUserInfo.name
+                userAge.text = it.age.toString()
+                userCompany.text = it.company
+                userEmail.text = it.baseUserInfo.email
+                userFavFruit.text = getString(it.favoriteFruit)
+                userPhone.text = it.phone
+                userRegistered.text = it.registeredDate
+                userAbout.text = it.about
+                userLatLon.text =
                     getString(R.string.user_lat_lon_placeholder_with_delimiter, it.lat, it.lon)
-                ImageViewCompat.setImageTintList(
-                    this.userEyeColor,
-                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(), it.eyeColor))
-                )
             }
+            setLocationListener(it.lat, it.lon)
+            setUserEyeColor(it.eyeColor)
         }
 
         viewModel.users.observe(viewLifecycleOwner) {
@@ -74,25 +80,19 @@ class MainFragment : Fragment() {
 
         viewModel.errorText.observe(viewLifecycleOwner) {
             Snackbar.make(
-                binding.usersList,
+                binding.root,
                 it ?: getString(R.string.unknown_error_text),
                 Snackbar.LENGTH_LONG
-            )
-                .show()
-        }
-
-        binding.refreshBtn.setOnClickListener {
-            viewModel.refreshBtnClicked()
+            ).show()
         }
 
         viewModel.isUserVisible.observe(viewLifecycleOwner) {
             binding.userInfo.root.visibility = if (it) {
-                callback.isEnabled = it
                 View.VISIBLE
             } else {
-                callback.isEnabled = it
                 View.GONE
             }
+            callback.isEnabled = it
         }
 
         return binding.root
@@ -103,8 +103,42 @@ class MainFragment : Fragment() {
         _binding = null
     }
 
+    private fun assembleRecyclerView() {
+        val linearLayoutManager = LinearLayoutManager(context)
+        binding.usersList.apply {
+            layoutManager = linearLayoutManager
+            adapter = recyclerAdapter
+            addItemDecoration(getDividerItemDecoration(linearLayoutManager))
+        }
+    }
+
+    private fun getDividerItemDecoration(linearLayoutManager: LinearLayoutManager) =
+        DividerItemDecoration(context, linearLayoutManager.orientation).apply {
+            setDrawable(
+                ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.users_divider,
+                    null
+                )!!
+            )
+        }
+
+
     fun onListItemClicked(item: BaseUserInfo) {
         viewModel.listItemClicked(item)
+    }
+
+    private fun setLocationListener(lat: Float, lon: Float) {
+        binding.userInfo.userLatLon.setOnClickListener {
+            requireContext().startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("geo:$lat,$lon")))
+        }
+    }
+
+    private fun setUserEyeColor(eyeColorResourceId: Int) {
+        ImageViewCompat.setImageTintList(
+            binding.userInfo.userEyeColor,
+            ColorStateList.valueOf(ContextCompat.getColor(requireContext(), eyeColorResourceId))
+        )
     }
 
 }

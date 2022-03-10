@@ -139,7 +139,7 @@ class MainViewModel : ViewModel() {
 
     private fun formNewUsersList() {
         _users.value =
-            if (_isUserVisible.value == true) {
+            if (_isUserVisible.value == true) { //todo может таки заменить это поле на null в selecteduser?
                 model.items.filter { selectedUser.value!!.friends.contains(it.baseUserInfo.id) } //todo проверить !!
                     .map { it.baseUserInfo }
             } else {
