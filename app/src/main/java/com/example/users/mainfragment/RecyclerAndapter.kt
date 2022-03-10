@@ -28,7 +28,7 @@ class RecyclerAdapter(private val listener: MainFragment) : RecyclerView.Adapter
         holder.binding.usersListName.text = item.name
         holder.binding.usersListEmail.text = item.email
 
-        //todo всё же, делая это каждый раз может быть не хорошо...не стоит ли хранить нужные ресурсы где-то в item? плюс это логика вне ViewModel. DataBinding?
+        //todo DataBinding?
         holder.binding.usersListActive.apply {
             val context = holder.itemView.context
             text = if(item.isActive) {

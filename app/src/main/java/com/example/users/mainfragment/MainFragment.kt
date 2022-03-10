@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.users.R
 import com.example.users.databinding.MainFragmentBinding
+import com.example.users.utils.cachedatabase.UserDatabase
 import com.example.users.utils.viewModelsExt
 import com.google.android.material.snackbar.Snackbar
 
@@ -27,7 +28,7 @@ class MainFragment : Fragment() {
         get() = _binding!!
 
     private val viewModel by viewModelsExt {
-        MainViewModel()
+        MainViewModel(UserDatabase.getDatabase(requireContext()).userDao())
     }
     private val recyclerAdapter = RecyclerAdapter(this)
 

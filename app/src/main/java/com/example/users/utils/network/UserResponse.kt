@@ -1,6 +1,7 @@
 package com.example.users.utils.network
 
 data class UserResponse(
+    val guid: String,
     val id: Int,
     val isActive: Boolean,
     val age: Int,
@@ -14,7 +15,7 @@ data class UserResponse(
     val registered: String,
     val latitude: Float,
     val longitude: Float,
-    val friends: List<FriendsResponse>, //todo List?
+    val friends: List<FriendsResponse>,
     val favoriteFruit: String
 )
 

@@ -1,6 +1,7 @@
 package com.example.users.mainfragment
 
 import androidx.room.Entity
+import androidx.room.PrimaryKey
 
 data class BaseUserInfo(
     val id: Int,
@@ -9,9 +10,9 @@ data class BaseUserInfo(
     val isActive: Boolean
 )
 
-@Entity(tableName = "users_info")
+@Entity(tableName = "users")
 data class FullUserInfo(
-    
+    @PrimaryKey val guid: String,
     val baseUserInfo: BaseUserInfo,
     val age: Int,
     val eyeColor: Int,

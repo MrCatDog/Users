@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.users.R
 import com.example.users.utils.MutableLiveEvent
+import com.example.users.utils.cachedatabase.UserDao
 import com.example.users.utils.network.DataReceiver
 import com.example.users.utils.network.UserResponse
 import retrofit2.Call
@@ -17,7 +18,7 @@ import kotlin.collections.ArrayList
 const val PARSE_DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss Z"
 const val FORMAT_DATE_PATTERN = "HH:mm dd.MM.yy"
 
-class MainViewModel : ViewModel() {
+class MainViewModel(private val cache : UserDao) : ViewModel() {
 
     private val dataReceiver = DataReceiver()
 
@@ -29,6 +30,10 @@ class MainViewModel : ViewModel() {
     val selectedUser: LiveData<FullUserInfo>
         get() = _selectedUser
 
+    private val _isUserVisible = MutableLiveData<Boolean>()
+    val isUserVisible: LiveData<Boolean>
+        get() = _isUserVisible
+
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean>
         get() = _isLoading
@@ -37,28 +42,30 @@ class MainViewModel : ViewModel() {
     val errorText: LiveData<String?>
         get() = _errorText
 
-    private val _isUserVisible = MutableLiveData<Boolean>()
-    val isUserVisible: LiveData<Boolean>
-        get() = _isUserVisible
-
     private val model = MainModel()
     private val userBackstack = ArrayDeque<Int>()
 
     init {
         //todo проверить базу на существование если нет, грузим
-        loadUsers()
+        val users = cache.getAll()
+        if(users.isEmpty()) {
+            loadUsers()
+        } else {
+            model.items = users as ArrayList<FullUserInfo>
+            formNewUsersList()
+        }
     }
 
     private fun loadUsers() {
         _isLoading.value = true
         dataReceiver.requestUsers(this::onMainResponse, this::onMainFailure)
-        _isLoading.value = false
     }
 
     private fun onMainResponse(response: Response<List<UserResponse>>) {
         if (response.isSuccessful) {
             val users: List<FullUserInfo>? = response.body()?.map {
                 FullUserInfo(
+                    guid = it.guid,
                     baseUserInfo = BaseUserInfo(
                         id = it.id,
                         name = it.name,
@@ -89,7 +96,12 @@ class MainViewModel : ViewModel() {
                 )
             }
             if (users != null) {
+                cache.cleanTable()
+                cache.insertAll(users)
                 model.items = users as ArrayList<FullUserInfo>
+                if(_isUserVisible.value == true) {
+                    _selectedUser.value = findFullUserInfoById(_selectedUser.value!!.baseUserInfo.id)
+                }
                 formNewUsersList()
             } else {
                 _errorText.postValue(response.errorBody().toString())
@@ -97,12 +109,14 @@ class MainViewModel : ViewModel() {
         } else {
             _errorText.postValue(response.errorBody().toString())
         }
+        _isLoading.value = false
     }
 
     private fun onMainFailure(call: Call<List<UserResponse>>, e: Throwable) {
         if (!call.isCanceled) {
             _errorText.postValue(e.message)
         }
+        _isLoading.value = false
     }
 
     private fun transformDate(textDate: String) = formatDate(
@@ -127,7 +141,7 @@ class MainViewModel : ViewModel() {
     fun listItemClicked(item: BaseUserInfo) {
         if (item.isActive) {
             if(_isUserVisible.value == true) {
-                userBackstack.push(_selectedUser.value?.baseUserInfo?.id)
+                userBackstack.push(_selectedUser.value!!.baseUserInfo.id)
             }
             _selectedUser.value = findFullUserInfoById(item.id)
             _isUserVisible.value = true
@@ -140,7 +154,7 @@ class MainViewModel : ViewModel() {
     private fun formNewUsersList() {
         _users.value =
             if (_isUserVisible.value == true) { //todo может таки заменить это поле на null в selecteduser?
-                model.items.filter { selectedUser.value!!.friends.contains(it.baseUserInfo.id) } //todo проверить !!
+                model.items.filter { selectedUser.value!!.friends.contains(it.baseUserInfo.id) }
                     .map { it.baseUserInfo }
             } else {
                 model.items.map { it.baseUserInfo }
