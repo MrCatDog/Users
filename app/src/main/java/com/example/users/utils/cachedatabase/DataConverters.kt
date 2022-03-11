@@ -5,7 +5,7 @@ import com.example.users.mainfragment.BaseUserInfo
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
-class DataConverter {
+class DataConverters {
 
     @TypeConverter
     fun fromBaseUserInfo(value: BaseUserInfo): String {

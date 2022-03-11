@@ -7,9 +7,8 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.users.mainfragment.FullUserInfo
 
-// Annotates class to be a Room Database with a table (entity) of the Word class
 @Database(entities = [FullUserInfo::class], version = 1, exportSchema = false)
-@TypeConverters(DataConverter::class)
+@TypeConverters(DataConverters::class)
 abstract class UserDatabase : RoomDatabase() {
 
     abstract fun userDao(): UserDao
@@ -24,7 +23,7 @@ abstract class UserDatabase : RoomDatabase() {
                     context.applicationContext,
                     UserDatabase::class.java,
                     "user_database"
-                ).allowMainThreadQueries().build() //todo ну чо, корутины? https://stackoverflow.com/questions/44167111/android-room-simple-select-query-cannot-access-database-on-the-main-thread
+                ).build()
                 INSTANCE = instance
                 instance
             }
