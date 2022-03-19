@@ -16,14 +16,16 @@ import retrofit2.Response
 import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 import kotlin.collections.ArrayList
 
 const val PARSE_DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss Z"
 const val FORMAT_DATE_PATTERN = "HH:mm dd.MM.yy"
 
-class MainViewModel(private val cache: UserDao) : ViewModel() {
+class MainViewModel : ViewModel() {
 
-    private val dataReceiver = DataReceiver()
+    @Inject lateinit var dataReceiver : DataReceiver
+    @Inject lateinit var cache: UserDao
 
     private val _users = MutableLiveData<List<BaseUserInfo>>()
     val users: LiveData<List<BaseUserInfo>>
@@ -48,7 +50,7 @@ class MainViewModel(private val cache: UserDao) : ViewModel() {
     private val model = MainModel()
     private val userBackstack = ArrayDeque<Int>()
 
-    init {
+    fun loadOrRequest() {
         viewModelScope.launch(Dispatchers.IO) {
             val users = cache.getAll()
             if (users.isEmpty()) {

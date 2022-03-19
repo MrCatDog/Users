@@ -1,5 +1,6 @@
 package com.example.users.mainfragment
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.net.Uri
@@ -12,14 +13,13 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.users.R
+import com.example.users.appComponent
 import com.example.users.databinding.MainFragmentBinding
-import com.example.users.utils.cachedatabase.UserDatabase
-import com.example.users.utils.viewModelsExt
 import com.google.android.material.snackbar.Snackbar
-
 
 class MainFragment : Fragment() {
 
@@ -27,10 +27,14 @@ class MainFragment : Fragment() {
     private val binding
         get() = _binding!!
 
-    private val viewModel by viewModelsExt {
-        MainViewModel(UserDatabase.getDatabase(requireContext()).userDao())
-    }
+    private val viewModel: MainViewModel by viewModels()
     private val recyclerAdapter = RecyclerAdapter(this)
+
+    override fun onAttach(context: Context) {
+        requireContext().appComponent.inject(viewModel)
+        viewModel.loadOrRequest()
+        super.onAttach(context)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

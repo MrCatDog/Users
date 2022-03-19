@@ -1,19 +1,10 @@
 package com.example.users.utils.network
 
 import retrofit2.*
-import retrofit2.converter.gson.GsonConverterFactory
 import kotlin.reflect.KFunction1
 import kotlin.reflect.KFunction2
 
-const val BASE_URL = "https://firebasestorage.googleapis.com"
-
-class DataReceiver {
-
-    private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-    private val serverApi: ServerApi = retrofit.create(ServerApi::class.java)
+class DataReceiver(private val serverApi : ServerApi) {
 
     fun requestUsers(
         onResponse: KFunction1<Response<List<UserResponse>>, Unit>,
