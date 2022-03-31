@@ -1,7 +1,7 @@
 package com.example.users.utils.cachedatabase
 
 import androidx.room.TypeConverter
-import com.example.users.mainfragment.BaseUserInfo
+import com.example.users.mainfragment.model.BaseUserInfo
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 

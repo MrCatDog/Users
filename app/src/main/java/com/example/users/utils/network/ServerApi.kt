@@ -1,5 +1,6 @@
 package com.example.users.utils.network
 
+import com.example.users.mainfragment.model.dto.NetworkUser
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -13,6 +14,6 @@ interface ServerApi {
     fun getHotelList(
         @Query("alt") alt: String = DEFAULT_ALT,
         @Query("token") token: String = DEFAULT_TOKEN
-    ): Call<List<UserResponse>>
+    ): Call<List<NetworkUser>>
 
 }

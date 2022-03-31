@@ -1,19 +1,14 @@
-package com.example.users.mainfragment
+package com.example.users.mainfragment.model.dto
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-data class BaseUserInfo(
-    val id: Int,
+@Entity(tableName = "users")
+data class DBUser(
+    @PrimaryKey val id: Int,
     val name: String,
     val email: String,
-    val isActive: Boolean
-)
-
-@Entity(tableName = "users")
-data class FullUserInfo(
-    @PrimaryKey val guid: String,
-    val baseUserInfo: BaseUserInfo,
+    val isActive: Boolean,
     val age: Int,
     val eyeColor: Int,
     val company: String,
@@ -26,8 +21,3 @@ data class FullUserInfo(
     val lon: Float,
     val friends: Set<Int>
 )
-
-class MainModel {
-    var items = ArrayList<FullUserInfo>()
-}
-

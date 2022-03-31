@@ -3,7 +3,7 @@ package com.example.users.utils.cachedatabase
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import com.example.users.mainfragment.FullUserInfo
+import com.example.users.mainfragment.model.domainmodel.FullUserInfo
 
 @Dao
 interface UserDao {

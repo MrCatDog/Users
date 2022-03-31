@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.users.R
 import com.example.users.appComponent
 import com.example.users.databinding.MainFragmentBinding
+import com.example.users.mainfragment.model.domainmodel.FullUserInfo.BaseUserInfo
 import com.google.android.material.snackbar.Snackbar
 
 class MainFragment : Fragment() {

@@ -5,10 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.users.R
+import com.example.users.mainfragment.model.domainmodel.FullUserInfo.BaseUserInfo
+import com.example.users.mainfragment.model.domainmodel.FullUserInfo
+import com.example.users.mainfragment.model.domainmodel.MainModel
 import com.example.users.utils.MutableLiveEvent
 import com.example.users.utils.cachedatabase.UserDao
 import com.example.users.utils.network.DataReceiver
-import com.example.users.utils.network.UserResponse
+import com.example.users.mainfragment.model.dto.NetworkUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -67,7 +70,7 @@ class MainViewModel : ViewModel() {
         dataReceiver.requestUsers(this::onMainResponse, this::onMainFailure)
     }
 
-    private fun onMainResponse(response: Response<List<UserResponse>>) {
+    private fun onMainResponse(response: Response<List<NetworkUser>>) {
         if (response.isSuccessful) {
             val responseBody = response.body()
             if(responseBody != null) {
@@ -81,14 +84,14 @@ class MainViewModel : ViewModel() {
         _isLoading.value = false
     }
 
-    private fun onMainFailure(call: Call<List<UserResponse>>, e: Throwable) {
+    private fun onMainFailure(call: Call<List<NetworkUser>>, e: Throwable) {
         if (!call.isCanceled) {
             _errorText.postValue(e.message)
         }
         _isLoading.value = false
     }
 
-    private fun transformResponseToModel(body: List<UserResponse>): List<FullUserInfo> = body.map {
+    private fun transformResponseToModel(body: List<NetworkUser>): List<FullUserInfo> = body.map {
         FullUserInfo(
             guid = it.guid,
             baseUserInfo = BaseUserInfo(
