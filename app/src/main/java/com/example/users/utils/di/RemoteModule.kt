@@ -29,7 +29,6 @@ class RemoteModule {
     @Provides
     fun provideGson(): GsonConverterFactory = GsonConverterFactory.create()
 
-
     @Singleton
     @Provides
     fun provideServerApi(retrofit: Retrofit): ServerApi = retrofit.create(ServerApi::class.java)
