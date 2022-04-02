@@ -11,7 +11,7 @@ class DataReceiver(private val serverApi: ServerApi) {
         onResponse: KFunction1<Response<List<NetworkUser>>, Unit>,
         onFail: KFunction2<Call<List<NetworkUser>>, Throwable, Unit>
     ) {
-        serverApi.getHotelList().enqueue(object : Callback<List<NetworkUser>> {
+        serverApi.getUserList().enqueue(object : Callback<List<NetworkUser>> {
 
             override fun onFailure(call: Call<List<NetworkUser>>, t: Throwable) {
                 onFail(call, t)

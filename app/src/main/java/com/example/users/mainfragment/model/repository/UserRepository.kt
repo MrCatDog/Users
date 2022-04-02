@@ -6,7 +6,9 @@ import com.example.users.mainfragment.model.dto.DBUser
 import com.example.users.mainfragment.model.dto.NetworkUser
 import com.example.users.utils.cachedatabase.UserDao
 import com.example.users.utils.network.ServerApi
-import javax.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class UserRepository(
    private val serverApi: ServerApi,
@@ -19,15 +21,23 @@ class UserRepository(
         TODO("Not yet implemented")
     }
 
-    override fun updateUsersFromNetwork(): List<FullUserInfo> {
-        TODO("Not yet implemented")
+    override fun updateUsersFromNetwork(): ResultWrapper<List<FullUserInfo>> {
+        return safeApiCall(Dispatchers.IO) { serverApi.getUserList() }
     }
 }
 
-sealed class Result<T> {
+suspend fun <T> safeApiCall(dispatcher: CoroutineDispatcher, apiCall: suspend () -> T): ResultWrapper<T> {
+    return withContext(dispatcher) {
+        try {
+            ResultWrapper.Success(apiCall.invoke())
+        } catch (throwable: Throwable) {
+            ResultWrapper.Failure(throwable)
+        }
+    }
+}
 
-    data class Success<T>(val value: T) : Result<T>()
-
-    data class Failure<T>(val throwable: Throwable) : Result<T>()
-
+// wrapper
+sealed class ResultWrapper<out T> {
+    data class Success<out T>(val value: T): ResultWrapper<T>()
+    data class Failure(val error: Throwable? = null): ResultWrapper<Nothing>()
 }
