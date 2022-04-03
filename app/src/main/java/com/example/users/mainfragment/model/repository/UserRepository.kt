@@ -11,22 +11,28 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class UserRepository(
-   private val serverApi: ServerApi,
-   private val cache: UserDao,
-   private val userNetworkMapper: ListMapper<NetworkUser, FullUserInfo>,
-   private val userDBMapper: ListMapper<DBUser, FullUserInfo>
+    private val serverApi: ServerApi,
+    private val cache: UserDao,
+    private val userNetworkMapper: ListMapper<NetworkUser, FullUserInfo>,
+    private val userDBMapper: ListMapper<DBUser, FullUserInfo>
 ) : UserDBRepository, UserNetworkRepository {
 
-    override fun loadUsersFromDB(): List<FullUserInfo> {
+    override suspend fun loadUsersFromDB(): List<FullUserInfo> {
         TODO("Not yet implemented")
     }
 
-    override fun updateUsersFromNetwork(): ResultWrapper<List<FullUserInfo>> {
-        return safeApiCall(Dispatchers.IO) { serverApi.getUserList() }
+    override suspend fun updateUsersFromNetwork(): ResultWrapper<List<FullUserInfo>> {
+        return when (val answer = safeApiCall(Dispatchers.IO) { serverApi.getUserList() }) {
+            is ResultWrapper.Success -> ResultWrapper.Success(userNetworkMapper.map(answer.value))
+            is ResultWrapper.Failure -> ResultWrapper.Failure(answer.error)
+        }
     }
 }
 
-suspend fun <T> safeApiCall(dispatcher: CoroutineDispatcher, apiCall: suspend () -> T): ResultWrapper<T> {
+suspend fun <T> safeApiCall(
+    dispatcher: CoroutineDispatcher,
+    apiCall: suspend () -> T
+): ResultWrapper<T> {
     return withContext(dispatcher) {
         try {
             ResultWrapper.Success(apiCall.invoke())
@@ -38,6 +44,6 @@ suspend fun <T> safeApiCall(dispatcher: CoroutineDispatcher, apiCall: suspend ()
 
 // wrapper
 sealed class ResultWrapper<out T> {
-    data class Success<out T>(val value: T): ResultWrapper<T>()
-    data class Failure(val error: Throwable? = null): ResultWrapper<Nothing>()
+    data class Success<out T>(val value: T) : ResultWrapper<T>()
+    data class Failure(val error: Throwable? = null) : ResultWrapper<Nothing>()
 }

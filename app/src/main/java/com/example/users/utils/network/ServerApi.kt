@@ -14,6 +14,6 @@ interface ServerApi {
     fun getUserList(
         @Query("alt") alt: String = DEFAULT_ALT,
         @Query("token") token: String = DEFAULT_TOKEN
-    ): Call<List<NetworkUser>>
-
+    ): List<NetworkUser>
+//call?
 }

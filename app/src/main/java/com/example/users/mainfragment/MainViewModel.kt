@@ -12,6 +12,8 @@ import com.example.users.utils.MutableLiveEvent
 import com.example.users.utils.cachedatabase.UserDao
 import com.example.users.utils.network.DataReceiver
 import com.example.users.mainfragment.model.dto.NetworkUser
+import com.example.users.mainfragment.model.repository.ResultWrapper
+import com.example.users.mainfragment.model.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -29,6 +31,7 @@ class MainViewModel : ViewModel() {
 
     @Inject lateinit var dataReceiver : DataReceiver
     @Inject lateinit var cache: UserDao
+    @Inject lateinit var repository: UserRepository
 
     private val _users = MutableLiveData<List<BaseUserInfo>>()
     val users: LiveData<List<BaseUserInfo>>
@@ -57,7 +60,11 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val users = cache.getAll()
             if (users.isEmpty()) {
-                loadUsers()
+                //loadUsers()
+                when(val usersAnswer = repository.updateUsersFromNetwork()) {
+                    is ResultWrapper.Success -> updateData(usersAnswer.value)
+                    is ResultWrapper.Failure -> _errorText.postValue(usersAnswer.error!!.message) //todo
+                }
             } else {
                 model.items = users as ArrayList<FullUserInfo>
                 formNewUsersList()

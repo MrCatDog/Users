@@ -11,18 +11,18 @@ class DataReceiver(private val serverApi: ServerApi) {
         onResponse: KFunction1<Response<List<NetworkUser>>, Unit>,
         onFail: KFunction2<Call<List<NetworkUser>>, Throwable, Unit>
     ) {
-        serverApi.getUserList().enqueue(object : Callback<List<NetworkUser>> {
-
-            override fun onFailure(call: Call<List<NetworkUser>>, t: Throwable) {
-                onFail(call, t)
-            }
-
-            override fun onResponse(
-                call: Call<List<NetworkUser>>,
-                response: Response<List<NetworkUser>>
-            ) {
-                onResponse(response)
-            }
-        })
+//        serverApi.getUserList().enqueue(object : Callback<List<NetworkUser>> {
+//
+//            override fun onFailure(call: Call<List<NetworkUser>>, t: Throwable) {
+//                onFail(call, t)
+//            }
+//
+//            override fun onResponse(
+//                call: Call<List<NetworkUser>>,
+//                response: Response<List<NetworkUser>>
+//            ) {
+//                onResponse(response)
+//            }
+//        })
     }
 }
