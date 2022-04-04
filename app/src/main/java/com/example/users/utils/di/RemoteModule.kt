@@ -1,9 +1,11 @@
 package com.example.users.utils.di
 
+import com.example.users.mainfragment.model.dto.NetworkUser
 import com.example.users.utils.network.DataReceiver
 import com.example.users.utils.network.ServerApi
 import dagger.Module
 import dagger.Provides
+import retrofit2.CallAdapter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton

@@ -72,64 +72,64 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    private fun loadUsers() {
-        _isLoading.postValue(true)
-        dataReceiver.requestUsers(this::onMainResponse, this::onMainFailure)
-    }
-
-    private fun onMainResponse(response: Response<List<NetworkUser>>) {
-        if (response.isSuccessful) {
-            val responseBody = response.body()
-            if(responseBody != null) {
-                updateData(transformResponseToModel(responseBody))
-            } else {
-                _errorText.postValue(response.errorBody().toString())
-            }
-        } else {
-            _errorText.postValue(response.errorBody().toString())
-        }
-        _isLoading.value = false
-    }
-
-    private fun onMainFailure(call: Call<List<NetworkUser>>, e: Throwable) {
-        if (!call.isCanceled) {
-            _errorText.postValue(e.message)
-        }
-        _isLoading.value = false
-    }
-
-    private fun transformResponseToModel(body: List<NetworkUser>): List<FullUserInfo> = body.map {
-        FullUserInfo(
-            guid = it.guid,
-            baseUserInfo = BaseUserInfo(
-                id = it.id,
-                name = it.name,
-                email = it.email,
-                isActive = it.isActive
-            ),
-            age = it.age,
-            eyeColor = when (it.eyeColor) {
-                "brown" -> R.color.user_eye_color_brown
-                "blue" -> R.color.user_eye_color_blue
-                "green" -> R.color.user_eye_color_green
-                else -> R.color.white
-            },
-            company = it.company,
-            phone = it.phone,
-            address = it.address,
-            about = it.about,
-            favoriteFruit = when (it.favoriteFruit) {
-                "apple" -> R.string.user_fav_fruit_apple
-                "banana" -> R.string.user_fav_fruit_banana
-                "strawberry" -> R.string.user_fav_fruit_strawberry
-                else -> R.string.user_fav_fruit_unknown
-            },
-            registeredDate = transformDate(it.registered),
-            lat = it.latitude,
-            lon = it.longitude,
-            friends = it.friends.map { friend -> friend.id }.toSet()
-        )
-    }
+//    private fun loadUsers() {
+//        _isLoading.postValue(true)
+//        dataReceiver.requestUsers(this::onMainResponse, this::onMainFailure)
+//    }
+//
+//    private fun onMainResponse(response: Response<List<NetworkUser>>) {
+//        if (response.isSuccessful) {
+//            val responseBody = response.body()
+//            if(responseBody != null) {
+//                updateData(transformResponseToModel(responseBody))
+//            } else {
+//                _errorText.postValue(response.errorBody().toString())
+//            }
+//        } else {
+//            _errorText.postValue(response.errorBody().toString())
+//        }
+//        _isLoading.value = false
+//    }
+//
+//    private fun onMainFailure(call: Call<List<NetworkUser>>, e: Throwable) {
+//        if (!call.isCanceled) {
+//            _errorText.postValue(e.message)
+//        }
+//        _isLoading.value = false
+//    }
+//
+//    private fun transformResponseToModel(body: List<NetworkUser>): List<FullUserInfo> = body.map {
+//        FullUserInfo(
+//            guid = it.guid,
+//            baseUserInfo = BaseUserInfo(
+//                id = it.id,
+//                name = it.name,
+//                email = it.email,
+//                isActive = it.isActive
+//            ),
+//            age = it.age,
+//            eyeColor = when (it.eyeColor) {
+//                "brown" -> R.color.user_eye_color_brown
+//                "blue" -> R.color.user_eye_color_blue
+//                "green" -> R.color.user_eye_color_green
+//                else -> R.color.white
+//            },
+//            company = it.company,
+//            phone = it.phone,
+//            address = it.address,
+//            about = it.about,
+//            favoriteFruit = when (it.favoriteFruit) {
+//                "apple" -> R.string.user_fav_fruit_apple
+//                "banana" -> R.string.user_fav_fruit_banana
+//                "strawberry" -> R.string.user_fav_fruit_strawberry
+//                else -> R.string.user_fav_fruit_unknown
+//            },
+//            registeredDate = transformDate(it.registered),
+//            lat = it.latitude,
+//            lon = it.longitude,
+//            friends = it.friends.map { friend -> friend.id }.toSet()
+//        )
+//    }
 
     private fun updateData(users: List<FullUserInfo>) {
         model.items = users as ArrayList<FullUserInfo>
@@ -163,23 +163,23 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    private fun transformDate(textDate: String) = formatDate(
-        try {
-            parseDate(textDate)!! // "In case of error, returns null." but in case of error i go into the catch block :\
-        } catch (ex: Exception) {
-            _errorText.postValue(ex.message)
-            Calendar.getInstance().time
-        }
-    )
-
-    private fun parseDate(textDate: String) =
-        SimpleDateFormat(PARSE_DATE_PATTERN, Locale.US).parse(textDate)
-
-    private fun formatDate(date: Date) =
-        SimpleDateFormat(FORMAT_DATE_PATTERN, Locale.getDefault()).format(date).toString()
+//    private fun transformDate(textDate: String) = formatDate(
+//        try {
+//            parseDate(textDate)!! // "In case of error, returns null." but in case of error i go into the catch block :\
+//        } catch (ex: Exception) {
+//            _errorText.postValue(ex.message)
+//            Calendar.getInstance().time
+//        }
+//    )
+//
+//    private fun parseDate(textDate: String) =
+//        SimpleDateFormat(PARSE_DATE_PATTERN, Locale.US).parse(textDate)
+//
+//    private fun formatDate(date: Date) =
+//        SimpleDateFormat(FORMAT_DATE_PATTERN, Locale.getDefault()).format(date).toString()
 
     fun refreshBtnClicked() {
-        loadUsers()
+//        loadUsers()
     }
 
     fun listItemClicked(item: BaseUserInfo) {
