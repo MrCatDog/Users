@@ -23,7 +23,7 @@ class UserRepository(
 
     override suspend fun updateUsersFromNetwork(): ResultWrapper<List<FullUserInfo>> {
         return when (val answer = safeApiCall(Dispatchers.IO) { serverApi.getUserList() }) {
-            is ResultWrapper.Success -> ResultWrapper.Success(userNetworkMapper.map(answer.value.body()!!)) //todo или убрать Response или обработать эту фигню
+            is ResultWrapper.Success -> ResultWrapper.Success(userNetworkMapper.map(answer.value))
             is ResultWrapper.Failure -> ResultWrapper.Failure(answer.error)
         }
     }
