@@ -98,7 +98,7 @@ class MainFragment : Fragment() {
             } else {
                 View.GONE
             }
-            callback.isEnabled = it
+            callback.isEnabled = it //todo придумать как это сделать нормально
         }
 
         return binding.root

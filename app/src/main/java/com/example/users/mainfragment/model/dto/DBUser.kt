@@ -3,6 +3,7 @@ package com.example.users.mainfragment.model.dto
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+//todo ты уж определись, или mapper или typeConverter
 @Entity(tableName = "users")
 data class DBUser(
     @PrimaryKey val id: Int,

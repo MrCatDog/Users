@@ -2,7 +2,6 @@ package com.example.users.mainfragment.model.repository
 
 import com.example.users.mainfragment.model.mappers.ListMapper
 import com.example.users.mainfragment.model.domainmodel.FullUserInfo
-import com.example.users.mainfragment.model.dto.DBUser
 import com.example.users.mainfragment.model.dto.NetworkUser
 import com.example.users.utils.cachedatabase.UserDao
 import com.example.users.utils.network.ServerApi
@@ -13,36 +12,42 @@ import kotlinx.coroutines.withContext
 class UserRepository(
     private val serverApi: ServerApi,
     private val cache: UserDao,
-    private val userNetworkMapper: ListMapper<NetworkUser, FullUserInfo>,
-    private val userDBMapper: ListMapper<DBUser, FullUserInfo>
+    private val userNetworkMapper: ListMapper<NetworkUser, FullUserInfo>
 ) : UserDBRepository, UserNetworkRepository {
 
-    override suspend fun loadUsersFromDB(): List<FullUserInfo> {
-        TODO("Not yet implemented")
+    override suspend fun loadUsers(): ResultWrapper<List<FullUserInfo>> {
+        return when (val answer = safeCall(Dispatchers.IO) { cache.getAll() }) {
+            is ResultWrapper.Success -> ResultWrapper.Success(answer.value)
+            is ResultWrapper.Failure -> ResultWrapper.Failure(answer.error)
+        }
     }
 
-    override suspend fun updateUsersFromNetwork(): ResultWrapper<List<FullUserInfo>> {
-        return when (val answer = safeApiCall(Dispatchers.IO) { serverApi.getUserList() }) {
+    override suspend fun saveUsers(users: List<FullUserInfo>) {
+        cache.cleanTable()
+        cache.insertAll(users)
+    }
+
+    override suspend fun updateUsers(): ResultWrapper<List<FullUserInfo>> {
+        return when (val answer = safeCall(Dispatchers.IO) { serverApi.getUserList() }) {
             is ResultWrapper.Success -> ResultWrapper.Success(userNetworkMapper.map(answer.value))
             is ResultWrapper.Failure -> ResultWrapper.Failure(answer.error)
         }
     }
 }
 
-suspend fun <T> safeApiCall(
+suspend fun <T> safeCall(
     dispatcher: CoroutineDispatcher,
-    apiCall: suspend () -> T
+    Call: suspend () -> T
 ): ResultWrapper<T> {
     return withContext(dispatcher) {
         try {
-            ResultWrapper.Success(apiCall.invoke())
+            ResultWrapper.Success(Call.invoke())
         } catch (throwable: Throwable) {
             ResultWrapper.Failure(throwable)
         }
     }
 }
 
-// wrapper
 sealed class ResultWrapper<out T> {
     data class Success<out T>(val value: T) : ResultWrapper<T>()
     data class Failure(val error: Throwable? = null) : ResultWrapper<Nothing>()

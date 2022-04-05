@@ -8,7 +8,6 @@ import com.example.users.mainfragment.model.domainmodel.FullUserInfo.BaseUserInf
 import com.example.users.mainfragment.model.domainmodel.FullUserInfo
 import com.example.users.mainfragment.model.domainmodel.MainModel
 import com.example.users.utils.MutableLiveEvent
-import com.example.users.utils.cachedatabase.UserDao
 import com.example.users.mainfragment.model.repository.ResultWrapper
 import com.example.users.mainfragment.model.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
@@ -22,8 +21,6 @@ const val FORMAT_DATE_PATTERN = "HH:mm dd.MM.yy"
 
 class MainViewModel : ViewModel() {
 
-    @Inject
-    lateinit var cache: UserDao
     @Inject
     lateinit var repository: UserRepository
 
@@ -52,35 +49,36 @@ class MainViewModel : ViewModel() {
 
     fun loadOrRequest() {
         viewModelScope.launch(Dispatchers.IO) {
-            val users = cache.getAll()
-            if (users.isEmpty()) {
-                loadUsers()
-            } else {
-                model.items = users as ArrayList<FullUserInfo>
-                formNewUsersList()
+            when (val users = repository.loadUsers()) {
+                is ResultWrapper.Success -> if (users.value.isEmpty()) {
+                    loadUsers()
+                } else {
+                    updateData(users.value)
+                }
+                is ResultWrapper.Failure -> _errorText.postValue(users.error!!.message)
             }
+
         }
     }
 
     private suspend fun loadUsers() {
         _isLoading.postValue(true)
-        when (val usersAnswer = repository.updateUsersFromNetwork()) {
+        when (val usersAnswer = repository.updateUsers()) {
             is ResultWrapper.Success -> updateData(usersAnswer.value)
             is ResultWrapper.Failure -> _errorText.postValue(usersAnswer.error!!.message) //todo
         }
+        repository.saveUsers(model.items)
         _isLoading.postValue(false)
     }
 
     private fun updateData(users: List<FullUserInfo>) {
         model.items = users as ArrayList<FullUserInfo>
-        updateDisplayingInfo()
-        updateCache()
+        updateDisplayingUserInfo()
     }
 
-    private fun updateDisplayingInfo() {
+    private fun updateDisplayingUserInfo() {
         if (_isUserVisible.value == true) {
-            _selectedUser.value =
-                findFullUserInfoById(_selectedUser.value!!.baseUserInfo.id)
+            _selectedUser.postValue(findFullUserInfoById(_selectedUser.value!!.baseUserInfo.id))
         }
         formNewUsersList()
     }
@@ -94,13 +92,6 @@ class MainViewModel : ViewModel() {
                 model.items.map { it.baseUserInfo }
             }
         )
-    }
-
-    private fun updateCache() {
-        viewModelScope.launch(Dispatchers.IO) {
-            cache.cleanTable()
-            cache.insertAll(model.items)
-        }
     }
 
     fun refreshBtnClicked() {

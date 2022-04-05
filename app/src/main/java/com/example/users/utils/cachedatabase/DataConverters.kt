@@ -7,7 +7,7 @@ import com.google.gson.reflect.TypeToken
 
 class DataConverters {
 
-    private val gson = Gson()
+    private val gson = Gson() //todo DI же надо
 
     @TypeConverter
     fun fromBaseUserInfo(value: BaseUserInfo): String {
