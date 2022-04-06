@@ -13,7 +13,16 @@ class UserRepository(
     private val serverApi: ServerApi,
     private val cache: UserDao,
     private val userNetworkMapper: ListMapper<NetworkUser, FullUserInfo>
-) : UserDBRepository, UserNetworkRepository {
+) : UserMainRepository {
+
+    override suspend fun getUsers(): ResultWrapper<List<FullUserInfo>> {
+        val users = loadUsers()
+        return if (users is ResultWrapper.Success && users.value.isEmpty()) {
+            updateUsers()
+        } else {
+            users
+        }
+    }
 
     override suspend fun loadUsers(): ResultWrapper<List<FullUserInfo>> {
         return when (val answer = safeCall(Dispatchers.IO) { cache.getAll() }) {

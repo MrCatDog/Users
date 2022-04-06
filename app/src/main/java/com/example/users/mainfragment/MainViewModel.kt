@@ -49,38 +49,38 @@ class MainViewModel : ViewModel() {
 
     fun loadOrRequest() {
         viewModelScope.launch(Dispatchers.IO) {
-            when (val users = repository.loadUsers()) {
-                is ResultWrapper.Success -> if (users.value.isEmpty()) {
-                    loadUsers()
-                } else {
-                    updateData(users.value)
-                }
-                is ResultWrapper.Failure -> _errorText.postValue(users.error!!.message)
-            }
-
+            _isLoading.postValue(true)
+            handleAnswer(repository.getUsers())
         }
     }
 
     private suspend fun loadUsers() {
         _isLoading.postValue(true)
-        when (val usersAnswer = repository.updateUsers()) {
-            is ResultWrapper.Success -> updateData(usersAnswer.value)
-            is ResultWrapper.Failure -> _errorText.postValue(usersAnswer.error!!.message) //todo
+        handleAnswer(repository.updateUsers())
+    }
+
+    private fun handleAnswer(answer : ResultWrapper<List<FullUserInfo>>) {
+        when (answer) {
+            is ResultWrapper.Success -> updateDisplayingData(answer.value)
+            is ResultWrapper.Failure -> _errorText.postValue(answer.error!!.message) //todo
         }
-        repository.saveUsers(model.items)
+    }
+
+    private fun updateDisplayingData(users: List<FullUserInfo>) {
+        updateData(users)
+        updateDisplayingUserInfo()
+        formNewUsersList()
         _isLoading.postValue(false)
     }
 
     private fun updateData(users: List<FullUserInfo>) {
         model.items = users as ArrayList<FullUserInfo>
-        updateDisplayingUserInfo()
     }
 
     private fun updateDisplayingUserInfo() {
         if (_isUserVisible.value == true) {
             _selectedUser.postValue(findFullUserInfoById(_selectedUser.value!!.baseUserInfo.id))
         }
-        formNewUsersList()
     }
 
     private fun formNewUsersList() {
@@ -100,6 +100,8 @@ class MainViewModel : ViewModel() {
         }
     }
 
+    private fun findFullUserInfoById(id: Int) = model.items.find { it.baseUserInfo.id == id }
+
     fun listItemClicked(item: BaseUserInfo) {
         if (item.isActive) {
             if (_isUserVisible.value == true) {
@@ -110,8 +112,6 @@ class MainViewModel : ViewModel() {
             formNewUsersList()
         }
     }
-
-    private fun findFullUserInfoById(id: Int) = model.items.find { it.baseUserInfo.id == id }
 
     fun backBtnPressed() {
         if (userBackstack.isEmpty()) {
