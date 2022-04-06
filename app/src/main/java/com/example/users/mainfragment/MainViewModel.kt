@@ -9,7 +9,7 @@ import com.example.users.mainfragment.model.domainmodel.FullUserInfo
 import com.example.users.mainfragment.model.domainmodel.MainModel
 import com.example.users.utils.MutableLiveEvent
 import com.example.users.mainfragment.model.repository.ResultWrapper
-import com.example.users.mainfragment.model.repository.UserRepository
+import com.example.users.mainfragment.model.repository.UserMainRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
@@ -22,7 +22,7 @@ const val FORMAT_DATE_PATTERN = "HH:mm dd.MM.yy"
 class MainViewModel : ViewModel() {
 
     @Inject
-    lateinit var repository: UserRepository
+    lateinit var repository: UserMainRepository
 
     private val _users = MutableLiveData<List<BaseUserInfo>>()
     val users: LiveData<List<BaseUserInfo>>
