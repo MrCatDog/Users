@@ -16,6 +16,7 @@ class UserRepository(
 ) : UserMainRepository {
 
     override suspend fun getUsers(): ResultWrapper<List<FullUserInfo>> {
+        //todo переосмыслить эту хрень
         val users = loadUsers()
         return if (users is ResultWrapper.Success && users.value.isEmpty()) {
             updateUsers()
@@ -38,7 +39,11 @@ class UserRepository(
 
     override suspend fun updateUsers(): ResultWrapper<List<FullUserInfo>> {
         return when (val answer = safeCall(Dispatchers.IO) { serverApi.getUserList() }) {
-            is ResultWrapper.Success -> ResultWrapper.Success(userNetworkMapper.map(answer.value))
+            is ResultWrapper.Success -> run {
+                val users = userNetworkMapper.map(answer.value)
+                saveUsers(users)
+                ResultWrapper.Success(users)
+            }
             is ResultWrapper.Failure -> ResultWrapper.Failure(answer.error)
         }
     }

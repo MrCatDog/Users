@@ -14,6 +14,7 @@ class ListMapperImpl<I, O>(
     }
 }
 
+//todo определить нужно ли мне это вовсе
 interface NullableInputListMapper<I, O>: Mapper<List<I>?, List<O>>
 
 class NullableInputListMapperImpl<I, O>(

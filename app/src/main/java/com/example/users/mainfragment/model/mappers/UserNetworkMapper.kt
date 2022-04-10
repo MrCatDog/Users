@@ -38,8 +38,7 @@ class UserNetworkMapper : Mapper<NetworkUser, FullUserInfo> {
                 else -> R.string.user_fav_fruit_unknown
             },
             registeredDate = transformDate(input.registered),
-            lat = input.latitude,
-            lon = input.longitude,
+            location = FullUserInfo.Location(lat = input.latitude, lon = input.longitude),
             friends = NullableInputListMapperImpl(object :
                 Mapper<NetworkUser.FriendsResponse, Int> {
                 override fun map(input: NetworkUser.FriendsResponse): Int = input.id

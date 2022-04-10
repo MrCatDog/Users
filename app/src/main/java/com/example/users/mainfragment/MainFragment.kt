@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.users.R
 import com.example.users.appComponent
 import com.example.users.databinding.MainFragmentBinding
+import com.example.users.mainfragment.model.domainmodel.FullUserInfo
 import com.example.users.mainfragment.model.domainmodel.FullUserInfo.BaseUserInfo
 import com.google.android.material.snackbar.Snackbar
 
@@ -74,9 +75,9 @@ class MainFragment : Fragment() {
                 userRegistered.text = it.registeredDate
                 userAbout.text = it.about
                 userLatLon.text =
-                    getString(R.string.user_lat_lon_placeholder_with_delimiter, it.lat, it.lon)
+                    getString(R.string.user_lat_lon_placeholder_with_delimiter, it.location.lat, it.location.lon)
             }
-            setLocationListener(it.lat, it.lon)
+            setLocationListener(it.location)
             setUserEyeColor(it.eyeColor)
         }
 
@@ -134,9 +135,9 @@ class MainFragment : Fragment() {
         viewModel.listItemClicked(item)
     }
 
-    private fun setLocationListener(lat: Float, lon: Float) {
+    private fun setLocationListener(location: FullUserInfo.Location) {
         binding.userInfo.userLatLon.setOnClickListener {
-            requireContext().startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("geo:$lat,$lon")))
+            requireContext().startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("geo:$location.lat,$location.lon")))
         }
     }
 

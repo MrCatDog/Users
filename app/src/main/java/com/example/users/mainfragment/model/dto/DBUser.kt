@@ -1,7 +1,9 @@
 package com.example.users.mainfragment.model.dto
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.users.mainfragment.model.domainmodel.FullUserInfo
 
 //todo ты уж определись, или mapper или typeConverter
 @Entity(tableName = "users")
@@ -11,14 +13,13 @@ data class DBUser(
     val email: String,
     val isActive: Boolean,
     val age: Int,
-    val eyeColor: Int,
+    val eyeColor: String,
     val company: String,
     val phone: String,
     val address: String,
     val about: String,
-    val favoriteFruit: Int,
+    val favoriteFruit: String,
     val registeredDate: String,
-    val lat: Float,
-    val lon: Float,
+    @Embedded val location: FullUserInfo.Location,
     val friends: Set<Int>
 )

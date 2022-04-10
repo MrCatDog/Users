@@ -1,5 +1,6 @@
 package com.example.users.mainfragment.model.domainmodel
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -10,7 +11,7 @@ class MainModel {
 @Entity(tableName = "users")
 data class FullUserInfo(
     @PrimaryKey val guid: String,
-    val baseUserInfo: BaseUserInfo,
+    @Embedded val baseUserInfo: BaseUserInfo,
     val age: Int,
     val eyeColor: Int,
     val company: String,
@@ -19,8 +20,7 @@ data class FullUserInfo(
     val about: String,
     val favoriteFruit: Int,
     val registeredDate: String,
-    val lat: Float,
-    val lon: Float,
+    @Embedded val location: Location,
     val friends: Set<Int>
 ) {
     data class BaseUserInfo(
@@ -28,5 +28,9 @@ data class FullUserInfo(
         val name: String,
         val email: String,
         val isActive: Boolean
+    )
+    data class Location(
+        val lat: Float,
+        val lon: Float
     )
 }

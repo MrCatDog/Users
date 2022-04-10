@@ -48,21 +48,21 @@ class MainViewModel : ViewModel() {
     private val userBackstack = ArrayDeque<Int>()
 
     fun loadOrRequest() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _isLoading.postValue(true)
-            handleAnswer(repository.getUsers())
-        }
+        getUsers(repository::getUsers)
     }
 
-    private suspend fun loadUsers() {
-        _isLoading.postValue(true)
-        handleAnswer(repository.updateUsers())
+    private fun getUsers(repositoryFunction: suspend () -> ResultWrapper<List<FullUserInfo>>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.postValue(true)
+            handleAnswer(repositoryFunction.invoke())
+            _isLoading.postValue(false)
+        }
     }
 
     private fun handleAnswer(answer : ResultWrapper<List<FullUserInfo>>) {
         when (answer) {
             is ResultWrapper.Success -> updateDisplayingData(answer.value)
-            is ResultWrapper.Failure -> _errorText.postValue(answer.error!!.message) //todo
+            is ResultWrapper.Failure -> _errorText.postValue(answer.error?.message) //todo
         }
     }
 
@@ -70,7 +70,6 @@ class MainViewModel : ViewModel() {
         updateData(users)
         updateDisplayingUserInfo()
         formNewUsersList()
-        _isLoading.postValue(false)
     }
 
     private fun updateData(users: List<FullUserInfo>) {
@@ -95,9 +94,7 @@ class MainViewModel : ViewModel() {
     }
 
     fun refreshBtnClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
-            loadUsers()
-        }
+        getUsers(repository::updateUsers)
     }
 
     private fun findFullUserInfoById(id: Int) = model.items.find { it.baseUserInfo.id == id }
