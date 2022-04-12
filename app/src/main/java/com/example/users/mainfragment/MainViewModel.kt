@@ -62,7 +62,7 @@ class MainViewModel : ViewModel() {
     private fun handleAnswer(answer : ResultWrapper<List<FullUserInfo>>) {
         when (answer) {
             is ResultWrapper.Success -> updateDisplayingData(answer.value)
-            is ResultWrapper.Failure -> _errorText.postValue(answer.error?.message) //todo
+            is ResultWrapper.Failure -> _errorText.postValue(answer.error?.message)
         }
     }
 
