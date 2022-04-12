@@ -4,17 +4,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.users.R
+import com.example.users.mainfragment.model.domainmodel.FullUserInfo.BaseUserInfo
+import com.example.users.mainfragment.model.domainmodel.FullUserInfo
+import com.example.users.mainfragment.model.domainmodel.MainModel
 import com.example.users.utils.MutableLiveEvent
-import com.example.users.utils.cachedatabase.UserDao
-import com.example.users.utils.network.DataReceiver
-import com.example.users.utils.network.UserResponse
+import com.example.users.mainfragment.model.repository.ResultWrapper
+import com.example.users.mainfragment.model.repository.UserMainRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Response
-import java.lang.Exception
-import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -24,8 +21,8 @@ const val FORMAT_DATE_PATTERN = "HH:mm dd.MM.yy"
 
 class MainViewModel : ViewModel() {
 
-    @Inject lateinit var dataReceiver : DataReceiver
-    @Inject lateinit var cache: UserDao
+    @Inject
+    lateinit var repository: UserMainRepository
 
     private val _users = MutableLiveData<List<BaseUserInfo>>()
     val users: LiveData<List<BaseUserInfo>>
@@ -51,88 +48,38 @@ class MainViewModel : ViewModel() {
     private val userBackstack = ArrayDeque<Int>()
 
     fun loadOrRequest() {
+        getUsers(repository::getUsers)
+    }
+
+    private fun getUsers(repositoryFunction: suspend () -> ResultWrapper<List<FullUserInfo>>) {
         viewModelScope.launch(Dispatchers.IO) {
-            val users = cache.getAll()
-            if (users.isEmpty()) {
-                loadUsers()
-            } else {
-                model.items = users as ArrayList<FullUserInfo>
-                formNewUsersList()
-            }
+            _isLoading.postValue(true)
+            handleAnswer(repositoryFunction.invoke())
+            _isLoading.postValue(false)
         }
     }
 
-    private fun loadUsers() {
-        _isLoading.postValue(true)
-        dataReceiver.requestUsers(this::onMainResponse, this::onMainFailure)
-    }
-
-    private fun onMainResponse(response: Response<List<UserResponse>>) {
-        if (response.isSuccessful) {
-            val responseBody = response.body()
-            if(responseBody != null) {
-                updateData(transformResponseToModel(responseBody))
-            } else {
-                _errorText.postValue(response.errorBody().toString())
-            }
-        } else {
-            _errorText.postValue(response.errorBody().toString())
+    private fun handleAnswer(answer : ResultWrapper<List<FullUserInfo>>) {
+        when (answer) {
+            is ResultWrapper.Success -> updateDisplayingData(answer.value)
+            is ResultWrapper.Failure -> _errorText.postValue(answer.error?.message)
         }
-        _isLoading.value = false
     }
 
-    private fun onMainFailure(call: Call<List<UserResponse>>, e: Throwable) {
-        if (!call.isCanceled) {
-            _errorText.postValue(e.message)
-        }
-        _isLoading.value = false
-    }
-
-    private fun transformResponseToModel(body: List<UserResponse>): List<FullUserInfo> = body.map {
-        FullUserInfo(
-            guid = it.guid,
-            baseUserInfo = BaseUserInfo(
-                id = it.id,
-                name = it.name,
-                email = it.email,
-                isActive = it.isActive
-            ),
-            age = it.age,
-            eyeColor = when (it.eyeColor) {
-                "brown" -> R.color.user_eye_color_brown
-                "blue" -> R.color.user_eye_color_blue
-                "green" -> R.color.user_eye_color_green
-                else -> R.color.white
-            },
-            company = it.company,
-            phone = it.phone,
-            address = it.address,
-            about = it.about,
-            favoriteFruit = when (it.favoriteFruit) {
-                "apple" -> R.string.user_fav_fruit_apple
-                "banana" -> R.string.user_fav_fruit_banana
-                "strawberry" -> R.string.user_fav_fruit_strawberry
-                else -> R.string.user_fav_fruit_unknown
-            },
-            registeredDate = transformDate(it.registered),
-            lat = it.latitude,
-            lon = it.longitude,
-            friends = it.friends.map { friend -> friend.id }.toSet()
-        )
+    private fun updateDisplayingData(users: List<FullUserInfo>) {
+        updateData(users)
+        updateDisplayingUserInfo()
+        formNewUsersList()
     }
 
     private fun updateData(users: List<FullUserInfo>) {
         model.items = users as ArrayList<FullUserInfo>
-        updateDisplayingInfo()
-        updateCache()
     }
 
-    private fun updateDisplayingInfo() {
+    private fun updateDisplayingUserInfo() {
         if (_isUserVisible.value == true) {
-            _selectedUser.value =
-                findFullUserInfoById(_selectedUser.value!!.baseUserInfo.id)
+            _selectedUser.postValue(findFullUserInfoById(_selectedUser.value!!.baseUserInfo.id))
         }
-        formNewUsersList()
     }
 
     private fun formNewUsersList() {
@@ -146,31 +93,11 @@ class MainViewModel : ViewModel() {
         )
     }
 
-    private fun updateCache() {
-        viewModelScope.launch(Dispatchers.IO) {
-            cache.cleanTable()
-            cache.insertAll(model.items)
-        }
-    }
-
-    private fun transformDate(textDate: String) = formatDate(
-        try {
-            parseDate(textDate)!! // "In case of error, returns null." but in case of error i go into the catch block :\
-        } catch (ex: Exception) {
-            _errorText.postValue(ex.message)
-            Calendar.getInstance().time
-        }
-    )
-
-    private fun parseDate(textDate: String) =
-        SimpleDateFormat(PARSE_DATE_PATTERN, Locale.US).parse(textDate)
-
-    private fun formatDate(date: Date) =
-        SimpleDateFormat(FORMAT_DATE_PATTERN, Locale.getDefault()).format(date).toString()
-
     fun refreshBtnClicked() {
-        loadUsers()
+        getUsers(repository::updateUsers)
     }
+
+    private fun findFullUserInfoById(id: Int) = model.items.find { it.baseUserInfo.id == id }
 
     fun listItemClicked(item: BaseUserInfo) {
         if (item.isActive) {
@@ -182,8 +109,6 @@ class MainViewModel : ViewModel() {
             formNewUsersList()
         }
     }
-
-    private fun findFullUserInfoById(id: Int) = model.items.find { it.baseUserInfo.id == id }
 
     fun backBtnPressed() {
         if (userBackstack.isEmpty()) {

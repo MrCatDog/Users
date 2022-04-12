@@ -1,6 +1,5 @@
 package com.example.users.utils.di
 
-import com.example.users.utils.network.DataReceiver
 import com.example.users.utils.network.ServerApi
 import dagger.Module
 import dagger.Provides
@@ -16,10 +15,6 @@ class RemoteModule {
 
     @Singleton
     @Provides
-    fun provideNetworkUtils(serverApi: ServerApi): DataReceiver = DataReceiver(serverApi)
-
-    @Singleton
-    @Provides
     fun provideRetrofit(gson: GsonConverterFactory): Retrofit = Retrofit.Builder()
         .baseUrl(baseUrl)
         .addConverterFactory(gson)
@@ -28,7 +23,6 @@ class RemoteModule {
     @Singleton
     @Provides
     fun provideGson(): GsonConverterFactory = GsonConverterFactory.create()
-
 
     @Singleton
     @Provides

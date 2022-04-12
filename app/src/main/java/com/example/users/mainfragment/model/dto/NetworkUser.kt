@@ -1,6 +1,6 @@
-package com.example.users.utils.network
+package com.example.users.mainfragment.model.dto
 
-data class UserResponse(
+data class NetworkUser(
     val guid: String,
     val id: Int,
     val isActive: Boolean,
@@ -17,8 +17,8 @@ data class UserResponse(
     val longitude: Float,
     val friends: List<FriendsResponse>,
     val favoriteFruit: String
-)
-
-data class FriendsResponse(
-    val id: Int
-)
+) {
+    data class FriendsResponse(
+        val id: Int
+    )
+}
