@@ -5,7 +5,6 @@ import com.example.users.mainfragment.FORMAT_DATE_PATTERN
 import com.example.users.mainfragment.PARSE_DATE_PATTERN
 import com.example.users.mainfragment.model.domainmodel.FullUserInfo
 import com.example.users.mainfragment.model.dto.NetworkUser
-import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -37,7 +36,7 @@ class UserNetworkMapper : Mapper<NetworkUser, FullUserInfo> {
                 "strawberry" -> R.string.user_fav_fruit_strawberry
                 else -> R.string.user_fav_fruit_unknown
             },
-            registeredDate = transformDate(input.registered),
+            registeredDate = reformatDate(input.registered),
             location = FullUserInfo.Location(lat = input.latitude, lon = input.longitude),
             friends = NullableInputListMapperImpl(object :
                 Mapper<NetworkUser.FriendsResponse, Int> {
@@ -45,18 +44,10 @@ class UserNetworkMapper : Mapper<NetworkUser, FullUserInfo> {
             }).map(input.friends).toSet()
         )
 
-    private fun transformDate(textDate: String) = formatDate(
-        try {
-            parseDate(textDate)!! // "In case of error, returns null." but in case of error i go into the catch block :\
-        } catch (ex: Exception) {
-            //todo
-            //_errorText.postValue(ex.message)
-            Calendar.getInstance().time
-        }
-    )
+    private fun reformatDate(textDate: String) = formatDate(parseDate(textDate))
 
     private fun parseDate(textDate: String) =
-        SimpleDateFormat(PARSE_DATE_PATTERN, Locale.US).parse(textDate)
+        SimpleDateFormat(PARSE_DATE_PATTERN, Locale.US).parse(textDate) as Date
 
     private fun formatDate(date: Date) =
         SimpleDateFormat(FORMAT_DATE_PATTERN, Locale.getDefault()).format(date).toString()
