@@ -13,7 +13,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.users.R
@@ -21,7 +20,9 @@ import com.example.users.appComponent
 import com.example.users.databinding.MainFragmentBinding
 import com.example.users.mainfragment.model.domainmodel.FullUserInfo
 import com.example.users.mainfragment.model.domainmodel.FullUserInfo.BaseUserInfo
+import com.example.users.utils.viewModelsExt
 import com.google.android.material.snackbar.Snackbar
+import javax.inject.Inject
 
 class MainFragment : Fragment() {
 
@@ -29,13 +30,17 @@ class MainFragment : Fragment() {
     private val binding
         get() = _binding!!
 
-    private val viewModel: MainViewModel by viewModels()
+    @Inject
+    lateinit var viewModelSource: MainViewModel
+
+    private val viewModel: MainViewModel by viewModelsExt {
+        viewModelSource
+    }
     private val recyclerAdapter = RecyclerAdapter(this)
 
     override fun onAttach(context: Context) {
-        requireContext().appComponent.inject(viewModel)
-        viewModel.loadOrRequest()
         super.onAttach(context)
+        context.appComponent.inject(this)
     }
 
     override fun onCreateView(
@@ -75,7 +80,11 @@ class MainFragment : Fragment() {
                 userRegistered.text = it.registeredDate
                 userAbout.text = it.about
                 userLatLon.text =
-                    getString(R.string.user_lat_lon_placeholder_with_delimiter, it.location.lat, it.location.lon)
+                    getString(
+                        R.string.user_lat_lon_placeholder_with_delimiter,
+                        it.location.lat,
+                        it.location.lon
+                    )
             }
             setLocationListener(it.location)
             setUserEyeColor(it.eyeColor)
@@ -137,7 +146,12 @@ class MainFragment : Fragment() {
 
     private fun setLocationListener(location: FullUserInfo.Location) {
         binding.userInfo.userLatLon.setOnClickListener {
-            requireContext().startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("geo:$location.lat,$location.lon")))
+            requireContext().startActivity(
+                Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("geo:$location.lat,$location.lon")
+                )
+            )
         }
     }
 

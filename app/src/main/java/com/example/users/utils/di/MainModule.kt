@@ -1,5 +1,6 @@
 package com.example.users.utils.di
 
+import com.example.users.mainfragment.MainViewModel
 import com.example.users.mainfragment.model.domainmodel.FullUserInfo
 import com.example.users.mainfragment.model.dto.NetworkUser
 import com.example.users.mainfragment.model.mappers.ListMapper
@@ -15,6 +16,11 @@ import javax.inject.Singleton
 
 @Module
 class MainModule {
+
+    @Singleton
+    @Provides
+    fun provideMainViewModel(repository:UserMainRepository) : MainViewModel =
+        MainViewModel(repository)
 
     @Singleton
     @Provides

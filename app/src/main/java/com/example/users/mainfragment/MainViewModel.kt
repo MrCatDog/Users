@@ -13,16 +13,12 @@ import com.example.users.mainfragment.model.repository.UserMainRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
-import javax.inject.Inject
 import kotlin.collections.ArrayList
 
 const val PARSE_DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss Z"
 const val FORMAT_DATE_PATTERN = "HH:mm dd.MM.yy"
 
-class MainViewModel : ViewModel() {
-
-    @Inject
-    lateinit var repository: UserMainRepository
+class MainViewModel (private val repository: UserMainRepository) : ViewModel() {
 
     private val _users = MutableLiveData<List<BaseUserInfo>>()
     val users: LiveData<List<BaseUserInfo>>
@@ -47,7 +43,7 @@ class MainViewModel : ViewModel() {
     private val model = MainModel()
     private val userBackstack = ArrayDeque<Int>()
 
-    fun loadOrRequest() {
+    init {
         getUsers(repository::getUsers)
     }
 
@@ -67,18 +63,18 @@ class MainViewModel : ViewModel() {
     }
 
     private fun updateDisplayingData(users: List<FullUserInfo>) {
-        updateData(users)
+        updateUsers(users)
         updateDisplayingUserInfo()
         formNewUsersList()
     }
 
-    private fun updateData(users: List<FullUserInfo>) {
-        model.items = users as ArrayList<FullUserInfo>
+    private fun updateUsers(newUsers: List<FullUserInfo>) {
+        model.items = newUsers as ArrayList<FullUserInfo>
     }
 
     private fun updateDisplayingUserInfo() {
         if (_isUserVisible.value == true) {
-            _selectedUser.postValue(findFullUserInfoById(_selectedUser.value!!.baseUserInfo.id))
+            _selectedUser.postValue(findFullUserInfoById(_selectedUser.value!!.baseUserInfo.id)) //todo а если такого пользователя нет?
         }
     }
 
