@@ -1,6 +1,5 @@
 package com.example.users.mainfragment
 
-import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.net.Uri
@@ -22,7 +21,6 @@ import com.example.users.mainfragment.model.domainmodel.FullUserInfo
 import com.example.users.mainfragment.model.domainmodel.FullUserInfo.BaseUserInfo
 import com.example.users.utils.viewModelsExt
 import com.google.android.material.snackbar.Snackbar
-import javax.inject.Inject
 
 class MainFragment : Fragment() {
 
@@ -30,18 +28,10 @@ class MainFragment : Fragment() {
     private val binding
         get() = _binding!!
 
-    @Inject
-    lateinit var viewModelSource: MainViewModel
-
     private val viewModel: MainViewModel by viewModelsExt {
-        viewModelSource
+        requireContext().appComponent.provideMainViewModel()
     }
     private val recyclerAdapter = RecyclerAdapter(this)
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        context.appComponent.inject(this)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -1,7 +1,6 @@
 package com.example.users.utils.di
 
 import android.content.Context
-import com.example.users.mainfragment.MainFragment
 import com.example.users.mainfragment.MainViewModel
 import dagger.BindsInstance
 import dagger.Component
@@ -17,7 +16,7 @@ interface AppComponent {
         fun applicationContext(applicationContext: Context): Builder
         fun build(): AppComponent
     }
-    fun inject(fragment: MainFragment)
+    fun provideMainViewModel():MainViewModel
 }
 
 
