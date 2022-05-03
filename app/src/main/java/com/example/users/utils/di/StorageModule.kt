@@ -2,8 +2,8 @@ package com.example.users.utils.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.users.utils.cachedatabase.UserDao
-import com.example.users.utils.cachedatabase.UserDatabase
+import com.example.users.utils.database.UserDao
+import com.example.users.utils.database.UserDatabase
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton

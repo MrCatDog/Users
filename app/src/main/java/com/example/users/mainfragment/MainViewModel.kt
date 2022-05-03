@@ -13,12 +13,13 @@ import com.example.users.mainfragment.model.repository.UserMainRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 import kotlin.collections.ArrayList
 
 const val PARSE_DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss Z"
 const val FORMAT_DATE_PATTERN = "HH:mm dd.MM.yy"
 
-class MainViewModel (private val repository: UserMainRepository) : ViewModel() {
+class MainViewModel @Inject constructor(private val repository: UserMainRepository) : ViewModel() {
 
     private val _users = MutableLiveData<List<BaseUserInfo>>()
     val users: LiveData<List<BaseUserInfo>>

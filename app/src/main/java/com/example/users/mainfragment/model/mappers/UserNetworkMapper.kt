@@ -38,7 +38,7 @@ class UserNetworkMapper : Mapper<NetworkUser, FullUserInfo> {
             },
             registeredDate = reformatDate(input.registered),
             location = FullUserInfo.Location(lat = input.latitude, lon = input.longitude),
-            friends = NullableInputListMapperImpl(object :
+            friends = NullableInputListMapper(object :
                 Mapper<NetworkUser.FriendsResponse, Int> {
                 override fun map(input: NetworkUser.FriendsResponse): Int = input.id
             }).map(input.friends).toSet()

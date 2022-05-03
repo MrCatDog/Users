@@ -3,13 +3,16 @@ package com.example.users.mainfragment.model.repository
 import com.example.users.mainfragment.model.mappers.ListMapper
 import com.example.users.mainfragment.model.domainmodel.FullUserInfo
 import com.example.users.mainfragment.model.dto.NetworkUser
-import com.example.users.utils.cachedatabase.UserDao
+import com.example.users.utils.database.UserDao
 import com.example.users.utils.network.ServerApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class UserRepository(
+@Singleton
+class UserRepository @Inject constructor(
     private val serverApi: ServerApi,
     private val cache: UserDao,
     private val userNetworkMapper: ListMapper<NetworkUser, FullUserInfo>
