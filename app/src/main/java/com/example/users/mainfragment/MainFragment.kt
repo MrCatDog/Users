@@ -75,9 +75,12 @@ class MainFragment : Fragment() {
                         it.location.lat,
                         it.location.lon
                     )
+                ImageViewCompat.setImageTintList(
+                    userEyeColor,
+                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(), it.eyeColor))
+                )
             }
             setLocationListener(it.location)
-            setUserEyeColor(it.eyeColor)
         }
 
         viewModel.users.observe(viewLifecycleOwner) {
@@ -129,7 +132,6 @@ class MainFragment : Fragment() {
             )
         }
 
-
     fun onListItemClicked(item: BaseUserInfo) {
         viewModel.listItemClicked(item)
     }
@@ -144,12 +146,4 @@ class MainFragment : Fragment() {
             )
         }
     }
-
-    private fun setUserEyeColor(eyeColorResourceId: Int) {
-        ImageViewCompat.setImageTintList(
-            binding.userInfo.userEyeColor,
-            ColorStateList.valueOf(ContextCompat.getColor(requireContext(), eyeColorResourceId))
-        )
-    }
-
 }

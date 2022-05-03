@@ -17,7 +17,6 @@ import javax.inject.Singleton
 @Module
 class MainModule {
 
-    @Singleton
     @Provides
     fun provideMainViewModel(repository:UserMainRepository) : MainViewModel =
         MainViewModel(repository)

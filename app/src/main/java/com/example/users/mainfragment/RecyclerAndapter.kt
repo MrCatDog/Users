@@ -33,10 +33,10 @@ class RecyclerAdapter(private val listener: MainFragment) : RecyclerView.Adapter
         holder.binding.usersListActive.apply {
             val context = holder.itemView.context
             text = if(item.isActive) {
-                setTextColor(context.getColor(R.color.users_list_isActive_true))
+                setTextColor(context.getColor(R.color.users_list_is_active_true))
                 context.getString(R.string.users_list_isActive_true)
             } else {
-                setTextColor(context.getColor(R.color.users_list_isActive_false))
+                setTextColor(context.getColor(R.color.users_list_is_active_false))
                 context.getString(R.string.users_list_isActive_false)
             }
         }
