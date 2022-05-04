@@ -2,7 +2,7 @@ package com.example.users.mainfragment.model.repository
 
 import com.example.users.mainfragment.model.domainmodel.FullUserInfo
 
-interface UserMainRepository : UserDBRepository, UserNetworkRepository {
+interface UserRepository : UserDBRepository, UserNetworkRepository {
     suspend fun getUsers() : ResultWrapper<List<FullUserInfo>>
 }
 

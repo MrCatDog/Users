@@ -12,11 +12,11 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class UserRepository @Inject constructor(
+class UserRepositoryImpl @Inject constructor(
     private val serverApi: ServerApi,
     private val cache: UserDao,
     private val userNetworkMapper: ListMapper<NetworkUser, FullUserInfo>
-) : UserMainRepository {
+) : UserRepository {
 
     override suspend fun getUsers(): ResultWrapper<List<FullUserInfo>> {
         //todo переосмыслить эту хрень

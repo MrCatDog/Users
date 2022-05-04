@@ -7,7 +7,7 @@ import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [MainModule::class, RemoteModule::class, StorageModule::class])
+@Component(modules = [RemoteModule::class, StorageModule::class, BinderModule::class])
 interface AppComponent {
 
     @Component.Builder

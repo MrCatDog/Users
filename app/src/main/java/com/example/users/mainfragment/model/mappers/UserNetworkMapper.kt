@@ -7,8 +7,9 @@ import com.example.users.mainfragment.model.domainmodel.FullUserInfo
 import com.example.users.mainfragment.model.dto.NetworkUser
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
-class UserNetworkMapper : Mapper<NetworkUser, FullUserInfo> {
+class UserNetworkMapper @Inject constructor() : Mapper<NetworkUser, FullUserInfo> {
 
     override fun map(input: NetworkUser): FullUserInfo =
         FullUserInfo(
