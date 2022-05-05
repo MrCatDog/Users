@@ -1,4 +1,4 @@
-package com.example.users.mainfragment
+package com.example.users.usersfragment
 
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -17,8 +17,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.users.R
 import com.example.users.appComponent
 import com.example.users.databinding.MainFragmentBinding
-import com.example.users.mainfragment.model.domainmodel.FullUserInfo
-import com.example.users.mainfragment.model.domainmodel.FullUserInfo.BaseUserInfo
+import com.example.users.model.domain.FullUserInfo
+import com.example.users.model.domain.FullUserInfo.BaseUserInfo
 import com.example.users.utils.viewModelsExt
 import com.google.android.material.snackbar.Snackbar
 
@@ -72,8 +72,8 @@ class MainFragment : Fragment() {
                 userLatLon.text =
                     getString(
                         R.string.user_lat_lon_placeholder_with_delimiter,
-                        it.location.lat,
-                        it.location.lon
+                        it.location.latitude,
+                        it.location.longitude
                     )
                 ImageViewCompat.setImageTintList(
                     userEyeColor,
@@ -141,7 +141,7 @@ class MainFragment : Fragment() {
             requireContext().startActivity(
                 Intent(
                     Intent.ACTION_VIEW,
-                    Uri.parse("geo:$location.lat,$location.lon")
+                    Uri.parse("geo:${location.latitude},${location.longitude}")
                 )
             )
         }

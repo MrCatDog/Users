@@ -1,19 +1,21 @@
-package com.example.users.mainfragment.model.mappers
+package com.example.users.model.network
 
 import com.example.users.R
-import com.example.users.mainfragment.FORMAT_DATE_PATTERN
-import com.example.users.mainfragment.PARSE_DATE_PATTERN
-import com.example.users.mainfragment.model.domainmodel.FullUserInfo
-import com.example.users.mainfragment.model.dto.NetworkUser
+import com.example.users.model.domain.FullUserInfo
+import com.example.users.usersfragment.model.mappers.Mapper
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
 class UserNetworkMapper @Inject constructor() : Mapper<NetworkUser, FullUserInfo> {
 
+    companion object {
+        const val PARSE_DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss Z"
+        const val FORMAT_DATE_PATTERN = "HH:mm dd.MM.yy"
+    }
+
     override fun map(input: NetworkUser): FullUserInfo =
         FullUserInfo(
-            guid = input.guid,
             baseUserInfo = FullUserInfo.BaseUserInfo(
                 id = input.id,
                 name = input.name,
@@ -38,11 +40,8 @@ class UserNetworkMapper @Inject constructor() : Mapper<NetworkUser, FullUserInfo
                 else -> R.string.user_fav_fruit_unknown
             },
             registeredDate = reformatDate(input.registered),
-            location = FullUserInfo.Location(lat = input.latitude, lon = input.longitude),
-            friends = NullableInputListMapper(object :
-                Mapper<NetworkUser.FriendsResponse, Int> {
-                override fun map(input: NetworkUser.FriendsResponse): Int = input.id
-            }).map(input.friends).toSet()
+            location = FullUserInfo.Location(input.latitude, input.longitude),
+            friends = input.friends.map { it.id }.toSet()
         )
 
     private fun reformatDate(textDate: String) = formatDate(parseDate(textDate))
@@ -52,4 +51,8 @@ class UserNetworkMapper @Inject constructor() : Mapper<NetworkUser, FullUserInfo
 
     private fun formatDate(date: Date) =
         SimpleDateFormat(FORMAT_DATE_PATTERN, Locale.getDefault()).format(date).toString()
+
+    override fun unmap(input: FullUserInfo): NetworkUser {
+        TODO("Not yet implemented and still not need")
+    }
 }

@@ -1,7 +1,7 @@
 package com.example.users.utils.di
 
 import android.content.Context
-import com.example.users.mainfragment.MainViewModel
+import com.example.users.usersfragment.MainViewModel
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton

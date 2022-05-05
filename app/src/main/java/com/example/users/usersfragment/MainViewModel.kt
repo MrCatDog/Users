@@ -1,23 +1,20 @@
-package com.example.users.mainfragment
+package com.example.users.usersfragment
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.users.mainfragment.model.domainmodel.FullUserInfo.BaseUserInfo
-import com.example.users.mainfragment.model.domainmodel.FullUserInfo
-import com.example.users.mainfragment.model.domainmodel.MainModel
+import com.example.users.model.domain.FullUserInfo.BaseUserInfo
+import com.example.users.model.domain.FullUserInfo
+import com.example.users.model.domain.MainModel
 import com.example.users.utils.MutableLiveEvent
-import com.example.users.mainfragment.model.repository.ResultWrapper
-import com.example.users.mainfragment.model.repository.UserRepository
+import com.example.users.model.repository.ResultWrapper
+import com.example.users.model.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
-
-const val PARSE_DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss Z"
-const val FORMAT_DATE_PATTERN = "HH:mm dd.MM.yy"
 
 class MainViewModel @Inject constructor(private val repository: UserRepository) : ViewModel() {
 

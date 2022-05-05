@@ -1,6 +1,6 @@
-package com.example.users.utils.network
+package com.example.users.model.network.utils
 
-import com.example.users.mainfragment.model.dto.NetworkUser
+import com.example.users.model.network.NetworkUser
 import retrofit2.http.GET
 import retrofit2.http.Query
 

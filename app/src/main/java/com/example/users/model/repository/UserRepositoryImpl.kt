@@ -1,10 +1,11 @@
-package com.example.users.mainfragment.model.repository
+package com.example.users.model.repository
 
-import com.example.users.mainfragment.model.mappers.ListMapper
-import com.example.users.mainfragment.model.domainmodel.FullUserInfo
-import com.example.users.mainfragment.model.dto.NetworkUser
-import com.example.users.utils.database.UserDao
-import com.example.users.utils.network.ServerApi
+import com.example.users.usersfragment.model.mappers.ListMapper
+import com.example.users.model.domain.FullUserInfo
+import com.example.users.model.database.DatabaseUser
+import com.example.users.model.network.NetworkUser
+import com.example.users.model.database.utils.UserDao
+import com.example.users.model.network.utils.ServerApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -15,7 +16,8 @@ import javax.inject.Singleton
 class UserRepositoryImpl @Inject constructor(
     private val serverApi: ServerApi,
     private val cache: UserDao,
-    private val userNetworkMapper: ListMapper<NetworkUser, FullUserInfo>
+    private val userNetworkMapper: ListMapper<NetworkUser, FullUserInfo>,
+    private val userDatabaseMapper: ListMapper<DatabaseUser, FullUserInfo>
 ) : UserRepository {
 
     override suspend fun getUsers(): ResultWrapper<List<FullUserInfo>> {
@@ -30,14 +32,14 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun loadUsers(): ResultWrapper<List<FullUserInfo>> {
         return when (val answer = safeCall(Dispatchers.IO) { cache.getAll() }) {
-            is ResultWrapper.Success -> ResultWrapper.Success(answer.value)
+            is ResultWrapper.Success -> ResultWrapper.Success(userDatabaseMapper.map(answer.value))
             is ResultWrapper.Failure -> ResultWrapper.Failure(answer.error)
         }
     }
 
     override suspend fun saveUsers(users: List<FullUserInfo>) {
         cache.cleanTable()
-        cache.insertAll(users)
+        cache.insertAll(userDatabaseMapper.unmap(users))
     }
 
     override suspend fun updateUsers(): ResultWrapper<List<FullUserInfo>> {

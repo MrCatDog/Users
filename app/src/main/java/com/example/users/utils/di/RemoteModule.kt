@@ -1,6 +1,6 @@
 package com.example.users.utils.di
 
-import com.example.users.utils.network.ServerApi
+import com.example.users.model.network.utils.ServerApi
 import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit

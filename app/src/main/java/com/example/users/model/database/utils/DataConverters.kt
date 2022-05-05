@@ -1,4 +1,4 @@
-package com.example.users.utils.database
+package com.example.users.model.database.utils
 
 import androidx.room.TypeConverter
 import com.google.gson.Gson

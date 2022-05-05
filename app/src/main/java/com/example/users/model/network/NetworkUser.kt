@@ -1,4 +1,4 @@
-package com.example.users.mainfragment.model.dto
+package com.example.users.model.network
 
 data class NetworkUser(
     val guid: String,
