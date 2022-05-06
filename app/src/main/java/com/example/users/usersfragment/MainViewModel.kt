@@ -38,6 +38,7 @@ class MainViewModel @Inject constructor(private val repository: UserRepository) 
     val errorText: LiveData<String?>
         get() = _errorText
 
+    //todo: убрать эту убогую модель, список вынести в репозиторий, обновлять его по вызову отсюда, пробрасывать через LiveData в UI
     private val model = MainModel()
     private val userBackstack = ArrayDeque<Int>()
 
