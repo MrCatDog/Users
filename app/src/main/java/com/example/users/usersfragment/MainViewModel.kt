@@ -1,9 +1,6 @@
 package com.example.users.usersfragment
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.users.model.domain.FullUserInfo.BaseUserInfo
 import com.example.users.model.domain.FullUserInfo
 import com.example.users.model.domain.MainModel
@@ -21,6 +18,10 @@ class MainViewModel @Inject constructor(private val repository: UserRepository) 
     private val _users = MutableLiveData<List<BaseUserInfo>>()
     val users: LiveData<List<BaseUserInfo>>
         get() = _users
+
+    val users2 = Transformations.map(repository.users) {
+
+    }
 
     private val _selectedUser = MutableLiveData<FullUserInfo>()
     val selectedUser: LiveData<FullUserInfo>
@@ -43,13 +44,14 @@ class MainViewModel @Inject constructor(private val repository: UserRepository) 
     private val userBackstack = ArrayDeque<Int>()
 
     init {
-        getUsers(repository::getUsers)
+        getUsers()
     }
 
-    private fun getUsers(repositoryFunction: suspend () -> ResultWrapper<List<FullUserInfo>>) {
+    private fun getUsers() {
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.postValue(true)
-            handleAnswer(repositoryFunction.invoke())
+            repository.getUsers()
+            //handleAnswer(repositoryFunction.invoke())
             _isLoading.postValue(false)
         }
     }

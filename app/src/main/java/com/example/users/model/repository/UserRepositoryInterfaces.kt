@@ -1,13 +1,17 @@
 package com.example.users.model.repository
 
+import androidx.lifecycle.LiveData
 import com.example.users.model.domain.FullUserInfo
 
 interface UserRepository : UserDBRepository, UserNetworkRepository {
-    suspend fun getUsers() : ResultWrapper<List<FullUserInfo>>
+
+    val users: LiveData<ResultWrapper<List<FullUserInfo>>>
+
+    suspend fun getUsers()
 }
 
 interface UserNetworkRepository {
-    suspend fun updateUsers() : ResultWrapper<List<FullUserInfo>>
+    suspend fun updateUsers()
 }
 
 interface UserDBRepository {

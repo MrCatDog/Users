@@ -1,5 +1,8 @@
 package com.example.users.model.repository
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import com.example.users.usersfragment.model.mappers.ListMapper
 import com.example.users.model.domain.FullUserInfo
 import com.example.users.model.database.DatabaseUser
@@ -15,42 +18,50 @@ import javax.inject.Singleton
 @Singleton
 class UserRepositoryImpl @Inject constructor(
     private val serverApi: ServerApi,
-    private val cache: UserDao,
+    private val database: UserDao,
     private val userNetworkMapper: ListMapper<NetworkUser, FullUserInfo>,
     private val userDatabaseMapper: ListMapper<DatabaseUser, FullUserInfo>
 ) : UserRepository {
 
-    override suspend fun getUsers(): ResultWrapper<List<FullUserInfo>> {
+    private val _users = MutableLiveData<ResultWrapper<List<FullUserInfo>>>()
+    override val users: LiveData<ResultWrapper<List<FullUserInfo>>>
+        get() = _users
+
+    override suspend fun getUsers() {
         //todo переосмыслить эту хрень
-        val users = loadUsers()
-        return if (users is ResultWrapper.Success && users.value.isEmpty()) {
+        val answer = loadUsers()
+        if (answer is ResultWrapper.Success && answer.value.isEmpty()) {
             updateUsers()
         } else {
-            users
+            _users.postValue(answer)
         }
     }
 
     override suspend fun loadUsers(): ResultWrapper<List<FullUserInfo>> {
-        return when (val answer = safeCall(Dispatchers.IO) { cache.getAll() }) {
+        return when (val answer = safeCall(Dispatchers.IO) { database.getAll() }) {
             is ResultWrapper.Success -> ResultWrapper.Success(userDatabaseMapper.map(answer.value))
             is ResultWrapper.Failure -> ResultWrapper.Failure(answer.error)
         }
     }
 
     override suspend fun saveUsers(users: List<FullUserInfo>) {
-        cache.cleanTable()
-        cache.insertAll(userDatabaseMapper.unmap(users))
+        database.apply {
+            cleanTable()
+            insertAll(userDatabaseMapper.unmap(users))
+        }
     }
 
-    override suspend fun updateUsers(): ResultWrapper<List<FullUserInfo>> {
-        return when (val answer = safeCall(Dispatchers.IO) { serverApi.getUserList() }) {
-            is ResultWrapper.Success -> run {
-                val users = userNetworkMapper.map(answer.value)
-                saveUsers(users)
-                ResultWrapper.Success(users)
+    override suspend fun updateUsers() {
+        _users.postValue(
+            when (val answer = safeCall(Dispatchers.IO) { serverApi.getUserList() }) {
+                is ResultWrapper.Success -> run {
+                    val users = userNetworkMapper.map(answer.value)
+                    saveUsers(users)
+                    ResultWrapper.Success(users)
+                }
+                is ResultWrapper.Failure -> ResultWrapper.Failure(answer.error)
             }
-            is ResultWrapper.Failure -> ResultWrapper.Failure(answer.error)
-        }
+        )
     }
 }
 
