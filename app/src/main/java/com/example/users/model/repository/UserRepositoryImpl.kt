@@ -3,11 +3,12 @@ package com.example.users.model.repository
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import com.example.users.model.domain.utils.ListMapper
+import com.example.users.model.database.asBaseInfoList
 import com.example.users.model.domain.FullUserInfo
-import com.example.users.model.database.DatabaseUser
-import com.example.users.model.network.NetworkUser
+import com.example.users.model.database.asDatabaseDTO
+import com.example.users.model.database.asDomainModel
 import com.example.users.model.database.utils.UserDao
+import com.example.users.model.network.asDomainModel
 import com.example.users.model.network.utils.ServerApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -18,54 +19,57 @@ import javax.inject.Singleton
 @Singleton
 class UserRepositoryImpl @Inject constructor(
     private val serverApi: ServerApi,
-    private val database: UserDao,
-    private val userNetworkMapper: ListMapper<NetworkUser, FullUserInfo>,
-    private val userDatabaseMapper: ListMapper<DatabaseUser, FullUserInfo>
+    private val database: UserDao
 ) : UserRepository {
 
-    private val _users = MutableLiveData<ResultWrapper<List<FullUserInfo>>>()
-    override val users: LiveData<ResultWrapper<List<FullUserInfo.BaseUserInfo>>> = Transformations.map(_users) {
-        return@map when (it) {
-            it is ResultWrapper.Success -> it
-            it is ResultWrapper.Failure -> it
+    private val _users = MutableLiveData<List<FullUserInfo>>()
+    override val users: LiveData<List<FullUserInfo.BaseUserInfo>> =
+        Transformations.map(_users) {
+            it.asBaseInfoList() //todo: need to return only baseInfo from DB and do not translate it here
         }
-    }
+
+    private val _error = MutableLiveData<ResultWrapper.Failure>()
+    val error: LiveData<ResultWrapper.Failure>
+        get() = _error
 
     override suspend fun getUsers() {
-        //todo переосмыслить эту хрень
-        val answer = loadUsers()
+        //todo переосмыслить эту хрень part of business logic, should be in VM
+        val answer = loadUsersFromDB()
         if (answer is ResultWrapper.Success && answer.value.isEmpty()) {
-            updateUsers()
+            loadUsresFromNetwork()
         } else {
-            _users.postValue(answer)
+            when (answer) {
+                is ResultWrapper.Success -> _users.postValue(answer.value)
+                is ResultWrapper.Failure -> _error.postValue()
+            }
+            val list = answer as ResultWrapper.Success
+            _users.postValue(list.value)
         }
     }
 
-    override suspend fun loadUsers(): ResultWrapper<List<FullUserInfo>> {
+    override suspend fun loadUsersFromDB(): ResultWrapper<List<FullUserInfo>> {
         return when (val answer = safeCall(Dispatchers.IO) { database.getAll() }) {
-            is ResultWrapper.Success -> ResultWrapper.Success(userDatabaseMapper.map(answer.value))
+            is ResultWrapper.Success -> ResultWrapper.Success(answer.value.asDomainModel())
             is ResultWrapper.Failure -> ResultWrapper.Failure(answer.error)
         }
     }
 
-    override suspend fun saveUsers(users: List<FullUserInfo>) {
-        database.apply {
-            cleanTable()
-            insertAll(userDatabaseMapper.unmap(users))
+    override suspend fun loadUsresFromNetwork() {
+        when (val answer = safeCall(Dispatchers.IO) { serverApi.getUserList() }) {
+            is ResultWrapper.Success -> {
+                val users = answer.value.asDomainModel()
+                saveUsersInDB(users)
+                _users.postValue(users)
+            }
+            is ResultWrapper.Failure -> _error.postValue(answer)
         }
     }
 
-    override suspend fun updateUsers() {
-        _users.postValue(
-            when (val answer = safeCall(Dispatchers.IO) { serverApi.getUserList() }) {
-                is ResultWrapper.Success -> run {
-                    val users = userNetworkMapper.map(answer.value)
-                    saveUsers(users)
-                    ResultWrapper.Success(users)
-                }
-                is ResultWrapper.Failure -> ResultWrapper.Failure(answer.error)
-            }
-        )
+    override suspend fun saveUsersInDB(users: List<FullUserInfo>) {
+        database.apply {
+            cleanTable()
+            insertAll(users.asDatabaseDTO())
+        }
     }
 }
 

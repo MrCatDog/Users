@@ -15,12 +15,10 @@ import kotlin.collections.ArrayList
 
 class MainViewModel @Inject constructor(private val repository: UserRepository) : ViewModel() {
 
-    private val _users = MutableLiveData<List<BaseUserInfo>>()
-    val users: LiveData<List<BaseUserInfo>>
-        get() = _users
+    val users : LiveData<List<BaseUserInfo>> = repository.users
 
-    val users2 = Transformations.map(repository.users) {
-
+    val errorText : LiveData<String?> = Transformations.map(repository.error) {
+        it.error?.message
     }
 
     private val _selectedUser = MutableLiveData<FullUserInfo>()
@@ -35,10 +33,6 @@ class MainViewModel @Inject constructor(private val repository: UserRepository) 
     val isLoading: LiveData<Boolean>
         get() = _isLoading
 
-    private val _errorText = MutableLiveEvent<String?>()
-    val errorText: LiveData<String?>
-        get() = _errorText
-
     //todo: убрать эту убогую модель, список вынести в репозиторий, обновлять его по вызову отсюда, пробрасывать через LiveData в UI
     private val model = MainModel()
     private val userBackstack = ArrayDeque<Int>()
@@ -50,7 +44,7 @@ class MainViewModel @Inject constructor(private val repository: UserRepository) 
     private fun getUsers() {
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.postValue(true)
-            repository.getUsers()
+            repository.getUsers() //todo Качать из инета, если в первый раз (SharedPref?) и с ДБ во всех остальных случаях.
             //handleAnswer(repositoryFunction.invoke())
             _isLoading.postValue(false)
         }
@@ -91,7 +85,10 @@ class MainViewModel @Inject constructor(private val repository: UserRepository) 
     }
 
     fun refreshBtnClicked() {
-        getUsers(repository::updateUsers)
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.loadUsresFromNetwork()
+        }
+//        getUsers(repository::loadUsresFromNetwork)
     }
 
     private fun findFullUserInfoById(id: Int) = model.items.find { it.baseUserInfo.id == id }
