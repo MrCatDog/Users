@@ -1,14 +1,15 @@
-package com.example.users.usersfragment
+package com.example.users.utils
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.users.usersfragment.RecyclerAdapter.VH
+import com.example.users.utils.RecyclerAdapter.VH
 import androidx.recyclerview.widget.RecyclerView
 import com.example.users.R
 import com.example.users.databinding.UsersListItemBinding
 import com.example.users.model.domain.FullUserInfo.BaseUserInfo
+import com.example.users.ui.MainFragment
 import java.util.ArrayList
 
 class RecyclerAdapter(private val listener: MainFragment) : RecyclerView.Adapter<VH>() {

@@ -3,7 +3,7 @@ package com.example.users.model.repository
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import com.example.users.usersfragment.model.mappers.ListMapper
+import com.example.users.model.domain.utils.ListMapper
 import com.example.users.model.domain.FullUserInfo
 import com.example.users.model.database.DatabaseUser
 import com.example.users.model.network.NetworkUser
@@ -24,8 +24,12 @@ class UserRepositoryImpl @Inject constructor(
 ) : UserRepository {
 
     private val _users = MutableLiveData<ResultWrapper<List<FullUserInfo>>>()
-    override val users: LiveData<ResultWrapper<List<FullUserInfo>>>
-        get() = _users
+    override val users: LiveData<ResultWrapper<List<FullUserInfo.BaseUserInfo>>> = Transformations.map(_users) {
+        return@map when (it) {
+            it is ResultWrapper.Success -> it
+            it is ResultWrapper.Failure -> it
+        }
+    }
 
     override suspend fun getUsers() {
         //todo переосмыслить эту хрень

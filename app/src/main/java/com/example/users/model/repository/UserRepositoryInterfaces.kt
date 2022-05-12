@@ -5,7 +5,7 @@ import com.example.users.model.domain.FullUserInfo
 
 interface UserRepository : UserDBRepository, UserNetworkRepository {
 
-    val users: LiveData<ResultWrapper<List<FullUserInfo>>>
+    val users: LiveData<ResultWrapper<List<FullUserInfo.BaseUserInfo>>>
 
     suspend fun getUsers()
 }

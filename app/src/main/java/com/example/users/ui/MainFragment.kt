@@ -1,4 +1,4 @@
-package com.example.users.usersfragment
+package com.example.users.ui
 
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -19,6 +19,8 @@ import com.example.users.appComponent
 import com.example.users.databinding.MainFragmentBinding
 import com.example.users.model.domain.FullUserInfo
 import com.example.users.model.domain.FullUserInfo.BaseUserInfo
+import com.example.users.viewmodels.MainViewModel
+import com.example.users.utils.RecyclerAdapter
 import com.example.users.utils.viewModelsExt
 import com.google.android.material.snackbar.Snackbar
 

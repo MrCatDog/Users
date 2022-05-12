@@ -1,7 +1,7 @@
 package com.example.users.utils.di
 
 import android.content.Context
-import com.example.users.usersfragment.MainViewModel
+import com.example.users.viewmodels.MainViewModel
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -16,7 +16,7 @@ interface AppComponent {
         fun applicationContext(applicationContext: Context): Builder
         fun build(): AppComponent
     }
-    fun provideMainViewModel():MainViewModel
+    fun provideMainViewModel(): MainViewModel
 }
 
 

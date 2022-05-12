@@ -3,7 +3,7 @@ package com.example.users.utils.di
 import com.example.users.model.domain.FullUserInfo
 import com.example.users.model.database.DatabaseUser
 import com.example.users.model.network.NetworkUser
-import com.example.users.usersfragment.model.mappers.Mapper
+import com.example.users.model.domain.utils.Mapper
 import com.example.users.model.database.UserDatabaseMapper
 import com.example.users.model.network.UserNetworkMapper
 import com.example.users.model.repository.UserRepository

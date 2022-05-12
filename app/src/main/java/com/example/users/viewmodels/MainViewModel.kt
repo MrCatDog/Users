@@ -1,4 +1,4 @@
-package com.example.users.usersfragment
+package com.example.users.viewmodels
 
 import androidx.lifecycle.*
 import com.example.users.model.domain.FullUserInfo.BaseUserInfo

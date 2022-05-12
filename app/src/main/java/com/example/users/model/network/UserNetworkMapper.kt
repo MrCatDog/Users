@@ -2,7 +2,7 @@ package com.example.users.model.network
 
 import com.example.users.R
 import com.example.users.model.domain.FullUserInfo
-import com.example.users.usersfragment.model.mappers.Mapper
+import com.example.users.model.domain.utils.Mapper
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject

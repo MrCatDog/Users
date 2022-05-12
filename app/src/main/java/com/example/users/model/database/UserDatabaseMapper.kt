@@ -2,7 +2,7 @@ package com.example.users.model.database
 
 import com.example.users.R
 import com.example.users.model.domain.FullUserInfo
-import com.example.users.usersfragment.model.mappers.Mapper
+import com.example.users.model.domain.utils.Mapper
 import javax.inject.Inject
 
 class UserDatabaseMapper @Inject constructor() : Mapper<DatabaseUser, FullUserInfo> {
