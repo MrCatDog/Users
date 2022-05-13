@@ -29,7 +29,7 @@ class UserRepositoryImpl @Inject constructor(
         }
 
     private val _error = MutableLiveData<ResultWrapper.Failure>()
-    val error: LiveData<ResultWrapper.Failure>
+    override val error: LiveData<ResultWrapper.Failure>
         get() = _error
 
     override suspend fun getUsers() {
@@ -44,6 +44,13 @@ class UserRepositoryImpl @Inject constructor(
             }
             val list = answer as ResultWrapper.Success
             _users.postValue(list.value)
+        }
+    }
+
+    suspend fun loadBaseUsersInfoFromDB(): ResultWrapper<List<FullUserInfo.BaseUserInfo>> {
+        return when (val answer = safeCall(Dispatchers.IO) { database.getAllBaseInfo() }) {
+            is ResultWrapper.Success -> ResultWrapper.Success(answer.value)
+            is ResultWrapper.Failure -> ResultWrapper.Failure(answer.error)
         }
     }
 

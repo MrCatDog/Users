@@ -15,9 +15,9 @@ import kotlin.collections.ArrayList
 
 class MainViewModel @Inject constructor(private val repository: UserRepository) : ViewModel() {
 
-    val users : LiveData<List<BaseUserInfo>> = repository.users
+    val users: LiveData<List<BaseUserInfo>> = repository.users
 
-    val errorText : LiveData<String?> = Transformations.map(repository.error) {
+    val errorText: LiveData<String?> = Transformations.map(repository.error) {
         it.error?.message
     }
 
@@ -50,39 +50,39 @@ class MainViewModel @Inject constructor(private val repository: UserRepository) 
         }
     }
 
-    private fun handleAnswer(answer : ResultWrapper<List<FullUserInfo>>) {
-        when (answer) {
-            is ResultWrapper.Success -> updateDisplayingData(answer.value)
-            is ResultWrapper.Failure -> _errorText.postValue(answer.error?.message)
-        }
-    }
+//    private fun handleAnswer(answer: ResultWrapper<List<FullUserInfo>>) {
+//        when (answer) {
+//            is ResultWrapper.Success -> updateDisplayingData(answer.value)
+//            is ResultWrapper.Failure -> _errorText.postValue(answer.error?.message)
+//        }
+//    }
 
-    private fun updateDisplayingData(users: List<FullUserInfo>) {
-        updateUsers(users)
-        updateDisplayingUserInfo()
-        formNewUsersList()
-    }
+//    private fun updateDisplayingData(users: List<FullUserInfo>) {
+//        updateUsers(users)
+//        updateDisplayingUserInfo()
+//        formNewUsersList()
+//    }
 
-    private fun updateUsers(newUsers: List<FullUserInfo>) {
-        model.items = newUsers as ArrayList<FullUserInfo>
-    }
+//    private fun updateUsers(newUsers: List<FullUserInfo>) {
+//        model.items = newUsers as ArrayList<FullUserInfo>
+//    }
+//
+//    private fun updateDisplayingUserInfo() {
+//        if (_isUserVisible.value == true) {
+//            _selectedUser.postValue(findFullUserInfoById(_selectedUser.value!!.baseUserInfo.id)) //todo а если такого пользователя нет?
+//        }
+//    }
 
-    private fun updateDisplayingUserInfo() {
-        if (_isUserVisible.value == true) {
-            _selectedUser.postValue(findFullUserInfoById(_selectedUser.value!!.baseUserInfo.id)) //todo а если такого пользователя нет?
-        }
-    }
-
-    private fun formNewUsersList() {
-        _users.postValue(
-            if (_isUserVisible.value == true) {
-                model.items.filter { selectedUser.value!!.friends.contains(it.baseUserInfo.id) }
-                    .map { it.baseUserInfo }
-            } else {
-                model.items.map { it.baseUserInfo }
-            }
-        )
-    }
+//    private fun formNewUsersList() {
+//        _users.postValue(
+//            if (_isUserVisible.value == true) {
+//                model.items.filter { selectedUser.value!!.friends.contains(it.baseUserInfo.id) }
+//                    .map { it.baseUserInfo }
+//            } else {
+//                model.items.map { it.baseUserInfo }
+//            }
+//        )
+//    }
 
     fun refreshBtnClicked() {
         viewModelScope.launch(Dispatchers.IO) {

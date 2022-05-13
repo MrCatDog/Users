@@ -1,6 +1,5 @@
 package com.example.users.model.database.utils
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -18,5 +17,14 @@ interface UserDao {
 
     @Query("DELETE FROM users")
     fun cleanTable()
+
+    @Query("SELECT id, name, email, isActive FROM users")
+    fun getAllBaseInfo() : List<FullUserInfo.BaseUserInfo>
+
+    @Query("SELECT * FROM users WHERE id = :userId")
+    fun getUserFullInfo(userId : Int)
+
+    @Query("SELECT * FROM users WHERE id IN (:usersId)")
+    fun getUsersById(usersId: List<Int>)
 
 }
