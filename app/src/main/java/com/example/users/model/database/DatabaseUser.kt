@@ -22,43 +22,46 @@ data class DatabaseUser(
     val registeredDate: String,
     @Embedded val location: FullUserInfo.Location,
     val friends: Set<Int>
-)
-
-//todo строки в переменные, ебанутый!
-fun List<DatabaseUser>.asDomainModel() : List<FullUserInfo> {
-    return map {
+) {
+    fun asDomainModel(): FullUserInfo =
         FullUserInfo(
             baseUserInfo = FullUserInfo.BaseUserInfo(
-                id = it.id,
-                name = it.name,
-                email = it.email,
-                isActive = it.isActive
+                id = this.id,
+                name = this.name,
+                email = this.email,
+                isActive = this.isActive
             ),
-            age = it.age,
-            eyeColor = when (it.eyeColor) {
+            age = this.age,
+            eyeColor = when (this.eyeColor) {
                 "brown" -> R.color.user_eye_color_brown
                 "blue" -> R.color.user_eye_color_blue
                 "green" -> R.color.user_eye_color_green
                 else -> R.color.white
             },
-            company = it.company,
-            phone = it.phone,
-            address = it.address,
-            about = it.about,
-            favoriteFruit = when (it.favoriteFruit) {
+            company = this.company,
+            phone = this.phone,
+            address = this.address,
+            about = this.about,
+            favoriteFruit = when (this.favoriteFruit) {
                 "apple" -> R.string.user_fav_fruit_apple
                 "banana" -> R.string.user_fav_fruit_banana
                 "strawberry" -> R.string.user_fav_fruit_strawberry
                 else -> R.string.user_fav_fruit_unknown
             },
-            registeredDate = it.registeredDate,
-            location = it.location,
-            friends = it.friends
+            registeredDate = this.registeredDate,
+            location = this.location,
+            friends = this.friends
         )
+}
+
+//todo строки в переменные, ебанутый!
+fun List<DatabaseUser>.asDomainModel(): List<FullUserInfo> {
+    return map {
+        it.asDomainModel()
     }
 }
 
-fun List<FullUserInfo>.asDatabaseDTO() : List<DatabaseUser> {
+fun List<FullUserInfo>.asDatabaseDTO(): List<DatabaseUser> {
     return map {
         DatabaseUser(
             id = it.baseUserInfo.id,
@@ -89,7 +92,7 @@ fun List<FullUserInfo>.asDatabaseDTO() : List<DatabaseUser> {
     }
 }
 
-fun List<FullUserInfo>.asBaseInfoList() : List<FullUserInfo.BaseUserInfo> {
+fun List<FullUserInfo>.asBaseInfoList(): List<FullUserInfo.BaseUserInfo> {
     return map {
         it.baseUserInfo
     }

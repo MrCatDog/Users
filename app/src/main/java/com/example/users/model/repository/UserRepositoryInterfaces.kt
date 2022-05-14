@@ -8,15 +8,16 @@ interface UserRepository : UserDBRepository, UserNetworkRepository {
 
     val users: LiveData<List<FullUserInfo.BaseUserInfo>>
     val error: LiveData<ResultWrapper.Failure>
+    val detailedUserInfo: LiveData<FullUserInfo>
 
-    suspend fun getUsers()
 }
 
 interface UserNetworkRepository {
-    suspend fun loadUsresFromNetwork()
+    suspend fun loadUsersFromNetwork()
 }
 
 interface UserDBRepository {
-    suspend fun loadUsersFromDB() : ResultWrapper<List<FullUserInfo>>
+    suspend fun loadBaseUsersInfoFromDB(idList: List<Int> = emptyList())
     suspend fun saveUsersInDB(users: List<FullUserInfo>)
+    suspend fun loadUserDetails(id: Int)
 }

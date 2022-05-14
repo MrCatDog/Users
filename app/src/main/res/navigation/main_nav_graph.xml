@@ -7,5 +7,20 @@
     <fragment
         android:id="@+id/mainFragment"
         android:name="com.example.users.ui.MainFragment"
-        android:label="MainFragment" />
+        android:label="MainFragment" >
+        <action
+            android:id="@+id/action_mainFragment_to_userDetailsFragment"
+            app:destination="@id/userDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/userDetailsFragment"
+        android:name="com.example.users.ui.UserDetailsFragment"
+        android:label="UserDetailsFragment" >
+        <action
+            android:id="@+id/action_userDetailsFragment_self"
+            app:destination="@id/userDetailsFragment" />
+        <argument
+            android:name="userId"
+            app:argType="integer" />
+    </fragment>
 </navigation>

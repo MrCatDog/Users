@@ -8,6 +8,7 @@ class DataConverters {
 
     private val gson = Gson() //todo DI же надо
 
+    //todo Проверить телегу на счёт этого
     @TypeConverter
     fun fromFriendsIdSet(value: Set<Int>): String {
         val type = object : TypeToken<Set<Int>>() {}.type

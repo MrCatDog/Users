@@ -12,7 +12,7 @@ import com.example.users.model.domain.FullUserInfo.BaseUserInfo
 import com.example.users.ui.MainFragment
 import java.util.ArrayList
 
-class RecyclerAdapter(private val listener: MainFragment) : RecyclerView.Adapter<VH>() {
+class RecyclerAdapter(private val listener: (BaseUserInfo) -> Unit) : RecyclerView.Adapter<VH>() {
     class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val binding = UsersListItemBinding.bind(itemView)
     }
@@ -43,7 +43,7 @@ class RecyclerAdapter(private val listener: MainFragment) : RecyclerView.Adapter
         }
 
         holder.binding.root.setOnClickListener {
-            listener.onListItemClicked(item)
+            listener(item)
         }
     }
 

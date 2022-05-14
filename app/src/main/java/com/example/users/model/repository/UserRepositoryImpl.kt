@@ -3,6 +3,7 @@ package com.example.users.model.repository
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import com.example.users.model.database.DatabaseUser
 import com.example.users.model.database.asBaseInfoList
 import com.example.users.model.domain.FullUserInfo
 import com.example.users.model.database.asDatabaseDTO
@@ -10,6 +11,7 @@ import com.example.users.model.database.asDomainModel
 import com.example.users.model.database.utils.UserDao
 import com.example.users.model.network.asDomainModel
 import com.example.users.model.network.utils.ServerApi
+import com.example.users.utils.MutableLiveEvent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -22,51 +24,59 @@ class UserRepositoryImpl @Inject constructor(
     private val database: UserDao
 ) : UserRepository {
 
-    private val _users = MutableLiveData<List<FullUserInfo>>()
-    override val users: LiveData<List<FullUserInfo.BaseUserInfo>> =
-        Transformations.map(_users) {
-            it.asBaseInfoList() //todo: need to return only baseInfo from DB and do not translate it here
-        }
+    private val _users = MutableLiveData<List<FullUserInfo.BaseUserInfo>>()
+    override val users: LiveData<List<FullUserInfo.BaseUserInfo>>
+        get() = _users
 
-    private val _error = MutableLiveData<ResultWrapper.Failure>()
+    private val _detailedUserInfo = MutableLiveData<FullUserInfo>()
+    override val detailedUserInfo: LiveData<FullUserInfo>
+        get() = _detailedUserInfo
+
+    private val _error = MutableLiveEvent<ResultWrapper.Failure>()
     override val error: LiveData<ResultWrapper.Failure>
         get() = _error
 
-    override suspend fun getUsers() {
-        //todo переосмыслить эту хрень part of business logic, should be in VM
-        val answer = loadUsersFromDB()
-        if (answer is ResultWrapper.Success && answer.value.isEmpty()) {
-            loadUsresFromNetwork()
-        } else {
-            when (answer) {
-                is ResultWrapper.Success -> _users.postValue(answer.value)
-                is ResultWrapper.Failure -> _error.postValue()
+//    override suspend fun getUsers() {
+//        //todo переосмыслить эту хрень part of business logic, should be in VM
+//        val answer = loadUsersFromDB()
+//        if (answer is ResultWrapper.Success && answer.value.isEmpty()) {
+//            loadUsresFromNetwork()
+//        } else {
+//            when (answer) {
+//                is ResultWrapper.Success -> _users.postValue(answer.value)
+//                is ResultWrapper.Failure -> _error.postValue(answer)
+//            }
+//            val list = answer as ResultWrapper.Success
+//            _users.postValue(list.value)
+//        }
+//    }
+
+    override suspend fun loadBaseUsersInfoFromDB(idList: List<Int>) {
+        when (val answer: ResultWrapper<List<FullUserInfo.BaseUserInfo>> =
+            if (idList.isEmpty()) {
+                safeCall(Dispatchers.IO) { database.getAllBaseInfo() }
+            } else {
+                safeCall(Dispatchers.IO) { database.getUsersById(idList) }
             }
-            val list = answer as ResultWrapper.Success
-            _users.postValue(list.value)
+        ) {
+            is ResultWrapper.Success -> _users.postValue(answer.value!!) //todo опять эта херня
+            is ResultWrapper.Failure -> _error.postValue(answer)
         }
     }
 
-    suspend fun loadBaseUsersInfoFromDB(): ResultWrapper<List<FullUserInfo.BaseUserInfo>> {
-        return when (val answer = safeCall(Dispatchers.IO) { database.getAllBaseInfo() }) {
-            is ResultWrapper.Success -> ResultWrapper.Success(answer.value)
-            is ResultWrapper.Failure -> ResultWrapper.Failure(answer.error)
+    override suspend fun loadUserDetails(id: Int) {
+        when (val answer = safeCall(Dispatchers.IO) { database.getUserFullInfo(id) }) {
+            is ResultWrapper.Success -> _detailedUserInfo.postValue(answer.value.asDomainModel())
+            is ResultWrapper.Failure -> _error.postValue(answer)
         }
     }
 
-    override suspend fun loadUsersFromDB(): ResultWrapper<List<FullUserInfo>> {
-        return when (val answer = safeCall(Dispatchers.IO) { database.getAll() }) {
-            is ResultWrapper.Success -> ResultWrapper.Success(answer.value.asDomainModel())
-            is ResultWrapper.Failure -> ResultWrapper.Failure(answer.error)
-        }
-    }
-
-    override suspend fun loadUsresFromNetwork() {
+    override suspend fun loadUsersFromNetwork() {
         when (val answer = safeCall(Dispatchers.IO) { serverApi.getUserList() }) {
             is ResultWrapper.Success -> {
                 val users = answer.value.asDomainModel()
                 saveUsersInDB(users)
-                _users.postValue(users)
+                _users.postValue(users.asBaseInfoList())
             }
             is ResultWrapper.Failure -> _error.postValue(answer)
         }

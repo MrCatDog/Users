@@ -18,13 +18,14 @@ interface UserDao {
     @Query("DELETE FROM users")
     fun cleanTable()
 
+    //todo FullUserInfo.BaseUserInfo не DTO
     @Query("SELECT id, name, email, isActive FROM users")
     fun getAllBaseInfo() : List<FullUserInfo.BaseUserInfo>
 
     @Query("SELECT * FROM users WHERE id = :userId")
-    fun getUserFullInfo(userId : Int)
+    fun getUserFullInfo(userId : Int) : DatabaseUser
 
-    @Query("SELECT * FROM users WHERE id IN (:usersId)")
-    fun getUsersById(usersId: List<Int>)
+    @Query("SELECT id, name, email, isActive FROM users WHERE id IN (:usersId)")
+    fun getUsersById(usersId: List<Int>) : List<FullUserInfo.BaseUserInfo>
 
 }

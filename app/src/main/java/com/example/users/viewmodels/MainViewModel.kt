@@ -21,21 +21,25 @@ class MainViewModel @Inject constructor(private val repository: UserRepository) 
         it.error?.message
     }
 
-    private val _selectedUser = MutableLiveData<FullUserInfo>()
-    val selectedUser: LiveData<FullUserInfo>
-        get() = _selectedUser
+    private val _navigateToUserDetails = MutableLiveEvent<Int>()
+    val navigateToUserDetails : LiveData<Int>
+        get() = _navigateToUserDetails
 
-    private val _isUserVisible = MutableLiveData(false)
-    val isUserVisible: LiveData<Boolean>
-        get() = _isUserVisible
+//    private val _selectedUser = MutableLiveData<FullUserInfo>()
+//    val selectedUser: LiveData<FullUserInfo>
+//        get() = _selectedUser
+//
+//    private val _isUserVisible = MutableLiveData(false)
+//    val isUserVisible: LiveData<Boolean>
+//        get() = _isUserVisible
 
     private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean>
         get() = _isLoading
 
     //todo: убрать эту убогую модель, список вынести в репозиторий, обновлять его по вызову отсюда, пробрасывать через LiveData в UI
-    private val model = MainModel()
-    private val userBackstack = ArrayDeque<Int>()
+//    private val model = MainModel()
+//    private val userBackstack = ArrayDeque<Int>()
 
     init {
         getUsers()
@@ -44,7 +48,9 @@ class MainViewModel @Inject constructor(private val repository: UserRepository) 
     private fun getUsers() {
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.postValue(true)
-            repository.getUsers() //todo Качать из инета, если в первый раз (SharedPref?) и с ДБ во всех остальных случаях.
+            repository.loadUsersFromNetwork()
+            repository.loadBaseUsersInfoFromDB()
+//            repository.getUsers() //todo Качать из инета, если в первый раз (SharedPref?) и с ДБ во всех остальных случаях.
             //handleAnswer(repositoryFunction.invoke())
             _isLoading.postValue(false)
         }
@@ -86,30 +92,31 @@ class MainViewModel @Inject constructor(private val repository: UserRepository) 
 
     fun refreshBtnClicked() {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.loadUsresFromNetwork()
+            repository.loadUsersFromNetwork()
         }
 //        getUsers(repository::loadUsresFromNetwork)
     }
 
-    private fun findFullUserInfoById(id: Int) = model.items.find { it.baseUserInfo.id == id }
+//    private fun findFullUserInfoById(id: Int) = model.items.find { it.baseUserInfo.id == id }
 
     fun listItemClicked(item: BaseUserInfo) {
         if (item.isActive) {
-            if (_isUserVisible.value == true) {
-                userBackstack.push(_selectedUser.value!!.baseUserInfo.id)
-            }
-            _selectedUser.value = findFullUserInfoById(item.id)
-            _isUserVisible.value = true
-            formNewUsersList()
+            _navigateToUserDetails.postValue(item.id)
+//            if (_isUserVisible.value == true) {
+//                userBackstack.push(_selectedUser.value!!.baseUserInfo.id)
+//            }
+//            _selectedUser.value = findFullUserInfoById(item.id)
+//            _isUserVisible.value = true
+//            formNewUsersList()
         }
     }
 
-    fun backBtnPressed() {
-        if (userBackstack.isEmpty()) {
-            _isUserVisible.value = false
-        } else {
-            _selectedUser.value = findFullUserInfoById(userBackstack.pop())
-        }
-        formNewUsersList()
-    }
+//    fun backBtnPressed() {
+//        if (userBackstack.isEmpty()) {
+//            _isUserVisible.value = false
+//        } else {
+//            _selectedUser.value = findFullUserInfoById(userBackstack.pop())
+//        }
+//        formNewUsersList()
+//    }
 }
