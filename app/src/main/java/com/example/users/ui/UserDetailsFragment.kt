@@ -29,7 +29,7 @@ class UserDetailsFragment : Fragment() {
         get() = _binding!!
 
     private val viewModel: UserDetailsViewModel by viewModelsExt {
-        requireContext().appComponent.provideUserDetailsViewModels()
+        requireContext().appComponent.provideUserDetailsViewModel()
     }
     private val recyclerAdapter = RecyclerAdapter(viewModel::listItemClicked)
 

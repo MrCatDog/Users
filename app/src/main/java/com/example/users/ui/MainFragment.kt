@@ -63,7 +63,7 @@ class MainFragment : Fragment() {
         }
 
         viewModel.navigateToUserDetails.observe(viewLifecycleOwner) {
-            findNavController().navigate(R.id.userDetailsFragment) //todo скинуть аргумент
+            findNavController().navigate(MainFragmentDirections.actionMainFragmentToUserDetailsFragment(it)) //todo скинуть аргумент
         }
 
         return binding.root

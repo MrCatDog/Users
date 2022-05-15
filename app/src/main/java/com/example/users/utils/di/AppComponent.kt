@@ -18,7 +18,7 @@ interface AppComponent {
         fun build(): AppComponent
     }
     fun provideMainViewModel(): MainViewModel
-    fun provideUserDetailsViewModels(): UserDetailsViewModel
+    fun provideUserDetailsViewModel(): UserDetailsViewModel
 }
 
 

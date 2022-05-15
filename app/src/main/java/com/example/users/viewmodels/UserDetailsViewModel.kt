@@ -1,16 +1,18 @@
 package com.example.users.viewmodels
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import androidx.navigation.navArgument
 import com.example.users.model.domain.FullUserInfo
 import com.example.users.model.repository.UserRepository
+import com.example.users.ui.UserDetailsFragmentArgs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class UserDetailsViewModel @Inject constructor(private val repository: UserRepository) : ViewModel() {
+class UserDetailsViewModel @Inject constructor(
+    private val repository: UserRepository,
+    private val state: SavedStateHandle
+) : ViewModel() {
 
     val user: LiveData<FullUserInfo> = Transformations.map(repository.detailedUserInfo) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -27,7 +29,7 @@ class UserDetailsViewModel @Inject constructor(private val repository: UserRepos
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.loadUserDetails()
+            repository.loadUserDetails(state.get<Int>("userId")) //todo да блять, нахуй ваще нужны safeArgs если я тут опять залупу полуаю
         }
     }
 
