@@ -11,20 +11,20 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.users.R
 import com.example.users.appComponent
-import com.example.users.databinding.MainFragmentBinding
-import com.example.users.viewmodels.MainViewModel
+import com.example.users.databinding.UsresListFragmentBinding
+import com.example.users.viewmodels.UsersListViewModel
 import com.example.users.utils.RecyclerAdapter
 import com.example.users.utils.viewModelsExt
 import com.google.android.material.snackbar.Snackbar
 
-class MainFragment : Fragment() {
+class UsersListFragment : Fragment() {
 
-    private var _binding: MainFragmentBinding? = null
+    private var _binding: UsresListFragmentBinding? = null
     private val binding
         get() = _binding!!
 
-    private val viewModel: MainViewModel by viewModelsExt {
-        requireContext().appComponent.provideMainViewModel()
+    private val viewModel: UsersListViewModel by viewModelsExt {
+        requireContext().appComponent.provideUsersListViewModel()
     }
     private val recyclerAdapter = RecyclerAdapter(viewModel::listItemClicked)
 
@@ -33,7 +33,7 @@ class MainFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = MainFragmentBinding.inflate(inflater)
+        _binding = UsresListFragmentBinding.inflate(inflater)
 
         assembleRecyclerView()
 
@@ -63,7 +63,7 @@ class MainFragment : Fragment() {
         }
 
         viewModel.navigateToUserDetails.observe(viewLifecycleOwner) {
-            findNavController().navigate(MainFragmentDirections.actionMainFragmentToUserDetailsFragment(it)) //todo скинуть аргумент
+            findNavController().navigate(UsersListFragmentDirections.actionUsersListFragmentToUserDetailsFragment(it))
         }
 
         return binding.root

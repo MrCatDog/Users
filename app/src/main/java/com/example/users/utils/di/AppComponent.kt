@@ -1,7 +1,7 @@
 package com.example.users.utils.di
 
 import android.content.Context
-import com.example.users.viewmodels.MainViewModel
+import com.example.users.viewmodels.UsersListViewModel
 import com.example.users.viewmodels.UserDetailsViewModel
 import dagger.BindsInstance
 import dagger.Component
@@ -17,7 +17,7 @@ interface AppComponent {
         fun applicationContext(applicationContext: Context): Builder
         fun build(): AppComponent
     }
-    fun provideMainViewModel(): MainViewModel
+    fun provideUsersListViewModel(): UsersListViewModel
     fun provideUserDetailsViewModel(): UserDetailsViewModel
 }
 

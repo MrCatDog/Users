@@ -1,17 +1,14 @@
 package com.example.users.viewmodels
 
 import androidx.lifecycle.*
-import androidx.navigation.navArgument
 import com.example.users.model.domain.FullUserInfo
 import com.example.users.model.repository.UserRepository
-import com.example.users.ui.UserDetailsFragmentArgs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class UserDetailsViewModel @Inject constructor(
-    private val repository: UserRepository,
-    private val state: SavedStateHandle
+    private val repository: UserRepository
 ) : ViewModel() {
 
     val user: LiveData<FullUserInfo> = Transformations.map(repository.detailedUserInfo) {
@@ -27,15 +24,19 @@ class UserDetailsViewModel @Inject constructor(
         it.error?.message
     }
 
+    private val _navigateToUserDetails = MutableLiveData<Int>()
+    val navigateToUserDetails: LiveData<Int>
+        get() = _navigateToUserDetails
+
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.loadUserDetails(state.get<Int>("userId")) //todo да блять, нахуй ваще нужны safeArgs если я тут опять залупу полуаю
+            repository.loadUserDetails(1) //todo а если бы Hilt+SharedSaveState...
         }
     }
 
     fun listItemClicked(item: FullUserInfo.BaseUserInfo) {
         if (item.isActive) {
-
+            _navigateToUserDetails.postValue(item.id)
         }
     }
 }

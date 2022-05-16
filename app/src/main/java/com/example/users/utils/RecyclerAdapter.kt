@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.users.R
 import com.example.users.databinding.UsersListItemBinding
 import com.example.users.model.domain.FullUserInfo.BaseUserInfo
-import com.example.users.ui.MainFragment
 import java.util.ArrayList
 
 class RecyclerAdapter(private val listener: (BaseUserInfo) -> Unit) : RecyclerView.Adapter<VH>() {

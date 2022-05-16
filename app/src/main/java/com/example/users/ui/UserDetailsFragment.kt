@@ -11,6 +11,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavArgsLazy
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.users.R
@@ -76,6 +79,10 @@ class UserDetailsFragment : Fragment() {
                 it ?: getString(R.string.unknown_error_text),
                 Snackbar.LENGTH_LONG
             ).show()
+        }
+
+        viewModel.navigateToUserDetails.observe(viewLifecycleOwner) {
+            findNavController().navigate(UserDetailsFragmentDirections.actionUserDetailsFragmentSelf(it))
         }
 
         return super.onCreateView(inflater, container, savedInstanceState)
