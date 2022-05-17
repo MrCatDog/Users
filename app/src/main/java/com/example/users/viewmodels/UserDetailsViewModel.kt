@@ -30,7 +30,7 @@ class UserDetailsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.loadUserDetails(1) //todo а если бы Hilt+SharedSaveState...
+            repository.loadUserDetails(1) //todo а если бы Hilt+SharedSaveState...1 просто для теста
         }
     }
 

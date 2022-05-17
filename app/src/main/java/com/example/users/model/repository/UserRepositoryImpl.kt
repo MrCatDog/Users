@@ -2,12 +2,9 @@ package com.example.users.model.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import com.example.users.model.database.DatabaseUser
 import com.example.users.model.database.asBaseInfoList
 import com.example.users.model.domain.FullUserInfo
 import com.example.users.model.database.asDatabaseDTO
-import com.example.users.model.database.asDomainModel
 import com.example.users.model.database.utils.UserDao
 import com.example.users.model.network.asDomainModel
 import com.example.users.model.network.utils.ServerApi

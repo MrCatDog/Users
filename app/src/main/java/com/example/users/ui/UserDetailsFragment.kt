@@ -11,9 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.Fragment
-import androidx.navigation.NavArgsLazy
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.users.R
@@ -34,16 +32,26 @@ class UserDetailsFragment : Fragment() {
     private val viewModel: UserDetailsViewModel by viewModelsExt {
         requireContext().appComponent.provideUserDetailsViewModel()
     }
-    private val recyclerAdapter = RecyclerAdapter(viewModel::listItemClicked)
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = UserDetailsFragmentBinding.inflate(inflater)
 
-        assembleRecyclerView()
+        val recyclerAdapter = RecyclerAdapter(viewModel::listItemClicked)
+        val linearLayoutManager = LinearLayoutManager(context)
+
+        binding.friendsList.apply {
+            layoutManager = linearLayoutManager
+            adapter = recyclerAdapter
+            addItemDecoration(getDividerItemDecoration(linearLayoutManager))
+        }
+
+        viewModel.friends.observe(viewLifecycleOwner) {
+            recyclerAdapter.setData(it)
+        }
 
         viewModel.user.observe(viewLifecycleOwner) {
             binding.apply {
@@ -69,10 +77,6 @@ class UserDetailsFragment : Fragment() {
             setLocationListener(it.location)
         }
 
-        viewModel.friends.observe(viewLifecycleOwner) {
-            recyclerAdapter.setData(it)
-        }
-
         viewModel.errorText.observe(viewLifecycleOwner) {
             Snackbar.make(
                 binding.root,
@@ -85,21 +89,12 @@ class UserDetailsFragment : Fragment() {
             findNavController().navigate(UserDetailsFragmentDirections.actionUserDetailsFragmentSelf(it))
         }
 
-        return super.onCreateView(inflater, container, savedInstanceState)
+        return binding.root
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding =  null
-    }
-
-    private fun assembleRecyclerView() {
-        val linearLayoutManager = LinearLayoutManager(context)
-        binding.friendsList.apply {
-            layoutManager = linearLayoutManager
-            adapter = recyclerAdapter
-            addItemDecoration(getDividerItemDecoration(linearLayoutManager))
-        }
     }
 
     private fun getDividerItemDecoration(linearLayoutManager: LinearLayoutManager) =

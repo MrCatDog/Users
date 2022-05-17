@@ -26,7 +26,6 @@ class UsersListFragment : Fragment() {
     private val viewModel: UsersListViewModel by viewModelsExt {
         requireContext().appComponent.provideUsersListViewModel()
     }
-    private val recyclerAdapter = RecyclerAdapter(viewModel::listItemClicked)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,10 +34,17 @@ class UsersListFragment : Fragment() {
     ): View {
         _binding = UsresListFragmentBinding.inflate(inflater)
 
-        assembleRecyclerView()
+        val recyclerAdapter = RecyclerAdapter(viewModel::listItemClicked)
+        val linearLayoutManager = LinearLayoutManager(context)
 
-        binding.refreshBtn.setOnClickListener {
-            viewModel.refreshBtnClicked()
+        binding.usersList.apply {
+            layoutManager = linearLayoutManager
+            adapter = recyclerAdapter
+            addItemDecoration(getDividerItemDecoration(linearLayoutManager))
+        }
+
+        viewModel.users.observe(viewLifecycleOwner) {
+            recyclerAdapter.setData(it)
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner) {
@@ -48,10 +54,6 @@ class UsersListFragment : Fragment() {
                 } else {
                     View.GONE
                 }
-        }
-
-        viewModel.users.observe(viewLifecycleOwner) {
-            recyclerAdapter.setData(it)
         }
 
         viewModel.errorText.observe(viewLifecycleOwner) {
@@ -66,21 +68,16 @@ class UsersListFragment : Fragment() {
             findNavController().navigate(UsersListFragmentDirections.actionUsersListFragmentToUserDetailsFragment(it))
         }
 
+        binding.refreshBtn.setOnClickListener {
+            viewModel.refreshBtnClicked()
+        }
+
         return binding.root
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    private fun assembleRecyclerView() {
-        val linearLayoutManager = LinearLayoutManager(context)
-        binding.usersList.apply {
-            layoutManager = linearLayoutManager
-            adapter = recyclerAdapter
-            addItemDecoration(getDividerItemDecoration(linearLayoutManager))
-        }
     }
 
     private fun getDividerItemDecoration(linearLayoutManager: LinearLayoutManager) =
