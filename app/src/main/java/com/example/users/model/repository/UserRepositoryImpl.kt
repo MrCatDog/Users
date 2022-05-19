@@ -2,7 +2,6 @@ package com.example.users.model.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.users.model.database.asBaseInfoList
 import com.example.users.model.domain.FullUserInfo
 import com.example.users.model.database.asDatabaseDTO
 import com.example.users.model.database.utils.UserDao
@@ -33,27 +32,12 @@ class UserRepositoryImpl @Inject constructor(
     override val error: LiveData<ResultWrapper.Failure>
         get() = _error
 
-//    override suspend fun getUsers() {
-//        //todo переосмыслить эту хрень part of business logic, should be in VM
-//        val answer = loadUsersFromDB()
-//        if (answer is ResultWrapper.Success && answer.value.isEmpty()) {
-//            loadUsresFromNetwork()
-//        } else {
-//            when (answer) {
-//                is ResultWrapper.Success -> _users.postValue(answer.value)
-//                is ResultWrapper.Failure -> _error.postValue(answer)
-//            }
-//            val list = answer as ResultWrapper.Success
-//            _users.postValue(list.value)
-//        }
-//    }
-
-    override suspend fun loadBaseUsersInfoFromDB(idList: List<Int>) {
+    override suspend fun loadBaseUsersInfoFromDB(idList: List<Int>) { //todo ёпта, тепреь две переменных вызывают одно и тоже
         when (val answer: ResultWrapper<List<FullUserInfo.BaseUserInfo>> =
             if (idList.isEmpty()) {
                 safeCall(Dispatchers.IO) { database.getAllBaseInfo() }
             } else {
-                safeCall(Dispatchers.IO) { database.getUsersById(idList) }
+                safeCall(Dispatchers.IO) { database.getUsersBaseInfoById(idList) }
             }
         ) {
             is ResultWrapper.Success -> _users.postValue(answer.value!!) //todo опять эта херня
@@ -70,11 +54,7 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun loadUsersFromNetwork() {
         when (val answer = safeCall(Dispatchers.IO) { serverApi.getUserList() }) {
-            is ResultWrapper.Success -> {
-                val users = answer.value.asDomainModel()
-                saveUsersInDB(users)
-                _users.postValue(users.asBaseInfoList())
-            }
+            is ResultWrapper.Success -> saveUsersInDB(answer.value.asDomainModel())
             is ResultWrapper.Failure -> _error.postValue(answer)
         }
     }
