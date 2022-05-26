@@ -56,7 +56,7 @@ class UsersListFragment : Fragment() {
                 }
         }
 
-        viewModel.errorText.observe(viewLifecycleOwner) {
+        viewModel.error.observe(viewLifecycleOwner) {
             Snackbar.make(
                 binding.root,
                 it ?: getString(R.string.unknown_error_text),
