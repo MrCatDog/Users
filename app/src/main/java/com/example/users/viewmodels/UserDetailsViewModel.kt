@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import com.example.users.model.domain.FullUserInfo
 import com.example.users.model.repository.ResultWrapper
 import com.example.users.model.repository.UserRepository
+import com.example.users.utils.MutableLiveEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,18 +21,17 @@ class UserDetailsViewModel @Inject constructor(
     val friends: LiveData<List<FullUserInfo.BaseUserInfo>>
         get() = _friends
 
-    private val _error = MutableLiveData<String?>()
+    private val _error = MutableLiveEvent<String?>()
     val errorText: LiveData<String?>
         get() = _error
 
-    private val _navigateToUserDetails = MutableLiveData<Int>()
+    private val _navigateToUserDetails = MutableLiveEvent<Int>()
     val navigateToUserDetails: LiveData<Int>
         get() = _navigateToUserDetails
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            getUserDetailedInfo(1)
-//            repository.loadUserDetails(1) //todo а если бы Hilt+SharedSaveState...1 просто для теста
+            getUserDetailedInfo(0)//todo а если бы Hilt+SharedSaveState...1 просто для теста
         }
     }
 
@@ -48,8 +48,7 @@ class UserDetailsViewModel @Inject constructor(
     }
 
     private suspend fun getFriends(friendsIdList: List<Int>) {
-        when (val friendsAnswer =
-            repository.loadBaseUsersInfoFromDB(friendsIdList)) {
+        when (val friendsAnswer = repository.loadBaseUsersInfoFromDB(friendsIdList)) {
             is ResultWrapper.Success -> _friends.postValue(friendsAnswer.value!!) //todo да какого хера
             is ResultWrapper.Failure -> _error.postValue(friendsAnswer.error?.message)
         }

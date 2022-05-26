@@ -54,7 +54,7 @@ fun List<NetworkUser>.asDomainModel() : List<FullUserInfo> {
             company = it.company,
             phone = it.phone,
             address = it.address,
-            about = it.about,
+            about = it.about.trim(),
             favoriteFruit = when (it.favoriteFruit) {
                 "apple" -> R.string.user_fav_fruit_apple
                 "banana" -> R.string.user_fav_fruit_banana

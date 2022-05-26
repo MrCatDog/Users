@@ -33,14 +33,6 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun loadUsersFromNetwork() : ResultWrapper<List<FullUserInfo>> {
         return safeCall(Dispatchers.IO) { serverApi.getUserList().asDomainModel() }
-//        when (val answer = safeCall(Dispatchers.IO) { serverApi.getUserList() }) {
-//            is ResultWrapper.Success -> saveUsersInDB(answer.value.asDomainModel())
-//            //todo кусок бизнеса. Просто грузим, отвечаем удалось или нет, если удалось,
-//            // то домейн решает что делать, например забрать новые значения с базы данных
-//            // подумать что отсюда вообще возвращать, здесь ведь очень много ошибок
-//            // https://proandroiddev.com/android-error-handling-in-clean-architecture-844a7fc0dc03
-//            is ResultWrapper.Failure -> _error.postValue(answer)
-//        }
     }
 
     override suspend fun saveUsersInDB(users: List<FullUserInfo>) {

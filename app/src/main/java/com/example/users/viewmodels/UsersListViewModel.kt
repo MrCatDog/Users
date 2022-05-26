@@ -15,7 +15,7 @@ class UsersListViewModel @Inject constructor(private val repository: UserReposit
     val users: LiveData<List<BaseUserInfo>>
         get() = _users
 
-    private val _error = MutableLiveData<String>()
+    private val _error = MutableLiveEvent<String>()
     val error: LiveData<String>
         get() = _error
 
