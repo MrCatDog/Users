@@ -12,12 +12,12 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.users.R
 import com.example.users.appComponent
 import com.example.users.databinding.UserDetailsFragmentBinding
-import com.example.users.model.domain.FullUserInfo
 import com.example.users.utils.RecyclerAdapter
 import com.example.users.utils.viewModelsExt
 import com.example.users.viewmodels.UserDetailsViewModel
@@ -29,8 +29,10 @@ class UserDetailsFragment : Fragment() {
     private val binding
         get() = _binding!!
 
+    private val args: UserDetailsFragmentArgs by navArgs()
+
     private val viewModel: UserDetailsViewModel by viewModelsExt {
-        requireContext().appComponent.provideUserDetailsViewModel()
+        requireContext().appComponent.provideUserDetailsViewModelFactory().create(args.userId)
     }
 
     override fun onCreateView(
@@ -53,28 +55,30 @@ class UserDetailsFragment : Fragment() {
             recyclerAdapter.setData(it)
         }
 
-        viewModel.user.observe(viewLifecycleOwner) {
+        viewModel.user.observe(viewLifecycleOwner) { user ->
             binding.apply {
-                userName.text = it.baseUserInfo.name
-                userAge.text = it.age.toString()
-                userCompany.text = it.company
-                userEmail.text = it.baseUserInfo.email
-                userFavFruit.text = getString(it.favoriteFruit)
-                userPhone.text = it.phone
-                userRegistered.text = it.registeredDate
-                userAbout.text = it.about
+                userName.text = user.baseUserInfo.name
+                userAge.text = user.age.toString()
+                userCompany.text = user.company
+                userEmail.text = user.baseUserInfo.email
+                userFavFruit.text = getString(user.favoriteFruit)
+                userPhone.text = user.phone
+                userRegistered.text = user.registeredDate
+                userAbout.text = user.about
                 userLatLon.text =
                     getString(
                         R.string.user_lat_lon_placeholder_with_delimiter,
-                        it.location.latitude,
-                        it.location.longitude
+                        user.location.latitude,
+                        user.location.longitude
                     )
                 ImageViewCompat.setImageTintList(
                     userEyeColor,
-                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(), it.eyeColor))
+                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(), user.eyeColor))
                 )
+                binding.userLatLon.setOnClickListener {
+                    viewModel.userAddressClicked(user.location)
+                }
             }
-            setLocationListener(it.location)
         }
 
         viewModel.errorText.observe(viewLifecycleOwner) {
@@ -86,7 +90,26 @@ class UserDetailsFragment : Fragment() {
         }
 
         viewModel.navigateToUserDetails.observe(viewLifecycleOwner) {
-            findNavController().navigate(UserDetailsFragmentDirections.actionUserDetailsFragmentSelf(it))
+            findNavController().navigate(
+                UserDetailsFragmentDirections.actionUserDetailsFragmentSelf(
+                    it
+                )
+            )
+        }
+
+        viewModel.navigateToMap.observe(viewLifecycleOwner) {
+            requireContext().startActivity(
+                Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse(
+                        getString( //todo не работает с гуглом. Парсинг должен быть в VM
+                            R.string.user_location_URI,
+                            it.latitude,
+                            it.longitude
+                        )
+                    )
+                )
+            )
         }
 
         return binding.root
@@ -94,7 +117,7 @@ class UserDetailsFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding =  null
+        _binding = null
     }
 
     private fun getDividerItemDecoration(linearLayoutManager: LinearLayoutManager) =
@@ -107,15 +130,4 @@ class UserDetailsFragment : Fragment() {
                 )!!
             )
         }
-
-    private fun setLocationListener(location: FullUserInfo.Location) {
-        binding.userLatLon.setOnClickListener {
-            requireContext().startActivity(
-                Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse("geo:${location.latitude},${location.longitude}")
-                )
-            )
-        }
-    }
 }

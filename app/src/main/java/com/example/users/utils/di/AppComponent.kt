@@ -1,8 +1,8 @@
 package com.example.users.utils.di
 
 import android.content.Context
-import com.example.users.viewmodels.UsersListViewModel
-import com.example.users.viewmodels.UserDetailsViewModel
+import com.example.users.viewmodels.UserDetailsViewModelFactory
+import com.example.users.viewmodels.UsersListViewModelFactory
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -17,8 +17,8 @@ interface AppComponent {
         fun applicationContext(applicationContext: Context): Builder
         fun build(): AppComponent
     }
-    fun provideUsersListViewModel(): UsersListViewModel
-    fun provideUserDetailsViewModel(): UserDetailsViewModel
+    fun provideUsersListViewModelFactory(): UsersListViewModelFactory
+    fun provideUserDetailsViewModelFactory(): UserDetailsViewModelFactory
 }
 
 

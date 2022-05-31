@@ -5,12 +5,15 @@ import com.example.users.model.domain.FullUserInfo
 import com.example.users.model.repository.ResultWrapper
 import com.example.users.model.repository.UserRepository
 import com.example.users.utils.MutableLiveEvent
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-class UserDetailsViewModel @Inject constructor(
-    private val repository: UserRepository
+class UserDetailsViewModel @AssistedInject constructor(
+    private val repository: UserRepository,
+    @Assisted private val userId: Int
 ) : ViewModel() {
 
     private val _user = MutableLiveData<FullUserInfo>()
@@ -29,9 +32,13 @@ class UserDetailsViewModel @Inject constructor(
     val navigateToUserDetails: LiveData<Int>
         get() = _navigateToUserDetails
 
+    private val _navigateToMap = MutableLiveEvent<FullUserInfo.Location>()
+    val navigateToMap: LiveData<FullUserInfo.Location>
+        get() = _navigateToMap
+
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            getUserDetailedInfo(0)//todo а если бы Hilt+SharedSaveState...1 просто для теста
+            getUserDetailedInfo(userId)
         }
     }
 
@@ -49,7 +56,7 @@ class UserDetailsViewModel @Inject constructor(
 
     private suspend fun getFriends(friendsIdList: List<Int>) {
         when (val friendsAnswer = repository.loadBaseUsersInfoFromDB(friendsIdList)) {
-            is ResultWrapper.Success -> _friends.postValue(friendsAnswer.value!!) //todo да какого хера
+            is ResultWrapper.Success -> _friends.postValue(friendsAnswer.value) //todo да какого чёрта?
             is ResultWrapper.Failure -> _error.postValue(friendsAnswer.error?.message)
         }
     }
@@ -59,4 +66,13 @@ class UserDetailsViewModel @Inject constructor(
             _navigateToUserDetails.postValue(item.id)
         }
     }
+
+    fun userAddressClicked(location: FullUserInfo.Location) {
+        _navigateToMap.postValue(location)
+    }
+}
+
+@AssistedFactory
+interface UserDetailsViewModelFactory {
+    fun create(userId: Int): UserDetailsViewModel
 }

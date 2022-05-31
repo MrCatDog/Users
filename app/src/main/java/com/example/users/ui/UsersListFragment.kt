@@ -1,6 +1,7 @@
 package com.example.users.ui
 
 import android.os.Bundle
+import androidx.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,12 +20,19 @@ import com.google.android.material.snackbar.Snackbar
 
 class UsersListFragment : Fragment() {
 
+    companion object {
+        const val firstTimeLoadingSharedTag = "firstTimeLoading"
+    }
+
     private var _binding: UsresListFragmentBinding? = null
     private val binding
         get() = _binding!!
 
     private val viewModel: UsersListViewModel by viewModelsExt {
-        requireContext().appComponent.provideUsersListViewModel()
+        requireContext().appComponent.provideUsersListViewModelFactory().create(
+            PreferenceManager.getDefaultSharedPreferences(requireContext())
+                .getBoolean(firstTimeLoadingSharedTag, true)
+        )
     }
 
     override fun onCreateView(
@@ -33,7 +41,6 @@ class UsersListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = UsresListFragmentBinding.inflate(inflater)
-
         val recyclerAdapter = RecyclerAdapter(viewModel::listItemClicked)
         val linearLayoutManager = LinearLayoutManager(context)
 
@@ -65,11 +72,20 @@ class UsersListFragment : Fragment() {
         }
 
         viewModel.navigateToUserDetails.observe(viewLifecycleOwner) {
-            findNavController().navigate(UsersListFragmentDirections.actionUsersListFragmentToUserDetailsFragment(it))
+            findNavController().navigate(
+                UsersListFragmentDirections.actionUsersListFragmentToUserDetailsFragment(
+                    it
+                )
+            )
         }
 
         binding.refreshBtn.setOnClickListener {
             viewModel.refreshBtnClicked()
+        }
+
+        viewModel.isFirstLoaded.observe(viewLifecycleOwner) {
+            PreferenceManager.getDefaultSharedPreferences(requireContext()).edit()
+                .putBoolean(firstTimeLoadingSharedTag, it).apply()
         }
 
         return binding.root

@@ -5,11 +5,17 @@ import com.example.users.model.domain.FullUserInfo.BaseUserInfo
 import com.example.users.model.repository.ResultWrapper
 import com.example.users.utils.MutableLiveEvent
 import com.example.users.model.repository.UserRepository
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-class UsersListViewModel @Inject constructor(private val repository: UserRepository) : ViewModel() {
+class UsersListViewModel
+@AssistedInject constructor(
+    private val repository: UserRepository,
+    @Assisted private val firstTimeLoading: Boolean
+) : ViewModel() {
 
     private val _users = MutableLiveData<List<BaseUserInfo>>()
     val users: LiveData<List<BaseUserInfo>>
@@ -27,31 +33,40 @@ class UsersListViewModel @Inject constructor(private val repository: UserReposit
     val isLoading: LiveData<Boolean>
         get() = _isLoading
 
-    init {
-        getUsers()
-    }
+    private val _isFirstLoaded = MutableLiveEvent<Boolean>()
+    val isFirstLoaded: LiveData<Boolean>
+        get() = _isFirstLoaded
 
-    private fun getUsers() {
+    init {
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.postValue(true)
-            //todo Качать из инета, если в первый раз (SharedPref?) и с ДБ во всех остальных случаях.
-            updateUsersFromNetwork()
-            getUsersFromDB()
+            if (firstTimeLoading) {
+                _isFirstLoaded.postValue(updateUsersFromNetwork())
+            } else {
+                getUsersFromDB()
+            }
             _isLoading.postValue(false)
         }
     }
 
     private suspend fun getUsersFromDB() {
         when (val answer = repository.loadBaseUsersInfoFromDB()) {
-            is ResultWrapper.Success -> _users.postValue(answer.value!!)
+            is ResultWrapper.Success -> _users.postValue(answer.value) //todo странная штука
             is ResultWrapper.Failure -> _error.postValue(answer.error?.message)
         }
     }
 
-    private suspend fun updateUsersFromNetwork() {
-        when (val answer = repository.loadUsersFromNetwork()) {
-            is ResultWrapper.Success -> repository.saveUsersInDB(answer.value)
-            is ResultWrapper.Failure -> _error.postValue(answer.error?.message)
+    private suspend fun updateUsersFromNetwork(): Boolean {
+        return when (val answer = repository.loadUsersFromNetwork()) {
+            is ResultWrapper.Success -> {
+                _users.postValue(answer.value.map { it.baseUserInfo })
+                repository.saveUsersInDB(answer.value)
+                false
+            }
+            is ResultWrapper.Failure -> {
+                _error.postValue(answer.error?.message)
+                true
+            }
         }
     }
 
@@ -68,4 +83,9 @@ class UsersListViewModel @Inject constructor(private val repository: UserReposit
             _navigateToUserDetails.postValue(item.id)
         }
     }
+}
+
+@AssistedFactory
+interface UsersListViewModelFactory {
+    fun create(firstTimeLoading: Boolean): UsersListViewModel
 }
