@@ -1,5 +1,6 @@
 package com.example.users.viewmodels
 
+import android.net.Uri
 import androidx.lifecycle.*
 import com.example.users.model.domain.FullUserInfo
 import com.example.users.model.repository.ResultWrapper
@@ -15,6 +16,11 @@ class UserDetailsViewModel @AssistedInject constructor(
     private val repository: UserRepository,
     @Assisted private val userId: Int
 ) : ViewModel() {
+
+    companion object {
+        const val navigateToMapPrefix = "geo:"
+        const val navigateToMapDelimiter = ","
+    }
 
     private val _user = MutableLiveData<FullUserInfo>()
     val user: LiveData<FullUserInfo>
@@ -32,8 +38,8 @@ class UserDetailsViewModel @AssistedInject constructor(
     val navigateToUserDetails: LiveData<Int>
         get() = _navigateToUserDetails
 
-    private val _navigateToMap = MutableLiveEvent<FullUserInfo.Location>()
-    val navigateToMap: LiveData<FullUserInfo.Location>
+    private val _navigateToMap = MutableLiveEvent<Uri>()
+    val navigateToMap: LiveData<Uri>
         get() = _navigateToMap
 
     init {
@@ -56,7 +62,7 @@ class UserDetailsViewModel @AssistedInject constructor(
 
     private suspend fun getFriends(friendsIdList: List<Int>) {
         when (val friendsAnswer = repository.loadBaseUsersInfoFromDB(friendsIdList)) {
-            is ResultWrapper.Success -> _friends.postValue(friendsAnswer.value) //todo да какого чёрта?
+            is ResultWrapper.Success -> _friends.postValue(friendsAnswer.value)
             is ResultWrapper.Failure -> _error.postValue(friendsAnswer.error?.message)
         }
     }
@@ -68,7 +74,11 @@ class UserDetailsViewModel @AssistedInject constructor(
     }
 
     fun userAddressClicked(location: FullUserInfo.Location) {
-        _navigateToMap.postValue(location)
+        _navigateToMap.postValue(
+            Uri.parse(
+                navigateToMapPrefix + location.latitude + navigateToMapDelimiter + location.longitude
+            )
+        )
     }
 }
 

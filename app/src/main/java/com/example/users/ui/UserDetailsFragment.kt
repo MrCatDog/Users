@@ -2,7 +2,6 @@ package com.example.users.ui
 
 import android.content.Intent
 import android.content.res.ColorStateList
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -98,18 +97,7 @@ class UserDetailsFragment : Fragment() {
         }
 
         viewModel.navigateToMap.observe(viewLifecycleOwner) {
-            requireContext().startActivity(
-                Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse(
-                        getString( //todo не работает с гуглом. Парсинг должен быть в VM
-                            R.string.user_location_URI,
-                            it.latitude,
-                            it.longitude
-                        )
-                    )
-                )
-            )
+            requireContext().startActivity(Intent(Intent.ACTION_VIEW, it))
         }
 
         return binding.root

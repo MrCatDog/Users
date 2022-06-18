@@ -10,8 +10,9 @@ import javax.inject.Singleton
 @Module
 class RemoteModule {
 
-    //todo maybe i should throw it out of here
-    private val baseUrl = "https://firebasestorage.googleapis.com"
+    companion object {
+        const val baseUrl = "https://firebasestorage.googleapis.com"
+    }
 
     @Singleton
     @Provides

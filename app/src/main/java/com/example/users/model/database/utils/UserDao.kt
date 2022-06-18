@@ -1,6 +1,5 @@
 package com.example.users.model.database.utils
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -19,7 +18,7 @@ interface UserDao {
     @Query("DELETE FROM users")
     fun cleanTable()
 
-    //todo FullUserInfo.BaseUserInfo не DTO
+    //todo FullUserInfo.BaseUserInfo не DTO. И не похеру ли?
     @Query("SELECT id, name, email, isActive FROM users")
     fun getAllBaseInfo() : List<FullUserInfo.BaseUserInfo>
 

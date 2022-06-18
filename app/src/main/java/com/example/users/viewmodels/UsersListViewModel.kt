@@ -51,7 +51,7 @@ class UsersListViewModel
 
     private suspend fun getUsersFromDB() {
         when (val answer = repository.loadBaseUsersInfoFromDB()) {
-            is ResultWrapper.Success -> _users.postValue(answer.value) //todo странная штука
+            is ResultWrapper.Success -> _users.postValue(answer.value)
             is ResultWrapper.Failure -> _error.postValue(answer.error?.message)
         }
     }

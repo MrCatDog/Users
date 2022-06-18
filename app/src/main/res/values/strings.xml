@@ -15,7 +15,6 @@
     <string name="user_fav_fruit_precusre_text">Favorite fruit:</string>
 
     <string name="user_lat_lon_placeholder_with_delimiter">%1$f %2$f</string>
-    <string name="user_location_URI">geo:%1$f,%2$f</string>
 
     <string name="users_list_isActive_true">Active</string>
     <string name="users_list_isActive_false">Not active</string>
