@@ -5,6 +5,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.users.R
 import com.example.users.model.domain.FullUserInfo
+import com.example.users.model.database.DatabaseUser.Companion.COLORS
+import com.example.users.model.database.DatabaseUser.Companion.FRUITS
 
 @Entity(tableName = "users")
 data class DatabaseUser(
@@ -32,26 +34,29 @@ data class DatabaseUser(
                 isActive = this.isActive
             ),
             age = this.age,
-            eyeColor = when (this.eyeColor) {
-                "brown" -> R.color.user_eye_color_brown
-                "blue" -> R.color.user_eye_color_blue
-                "green" -> R.color.user_eye_color_green
-                else -> R.color.white
-            },
+            eyeColor = COLORS.getOrDefault(this.eyeColor, R.color.white),
             company = this.company,
             phone = this.phone,
             address = this.address,
             about = this.about,
-            favoriteFruit = when (this.favoriteFruit) {
-                "apple" -> R.string.user_fav_fruit_apple
-                "banana" -> R.string.user_fav_fruit_banana
-                "strawberry" -> R.string.user_fav_fruit_strawberry
-                else -> R.string.user_fav_fruit_unknown
-            },
+            favoriteFruit = FRUITS.getOrDefault(this.favoriteFruit, R.string.user_fav_fruit_unknown),
             registeredDate = this.registeredDate,
             location = this.location,
             friends = this.friends
         )
+
+    companion object {
+        val COLORS = mapOf(
+            "blue" to R.color.user_eye_color_blue,
+            "brown" to R.color.user_eye_color_brown,
+            "green" to R.color.user_eye_color_green
+        )
+        val FRUITS = mapOf(
+            "apple" to R.string.user_fav_fruit_apple,
+            "banana" to R.string.user_fav_fruit_banana,
+            "strawberry" to R.string.user_fav_fruit_strawberry
+        )
+    }
 }
 
 //todo строки в переменные, ебанутый!
@@ -69,7 +74,8 @@ fun List<FullUserInfo>.asDatabaseDTO(): List<DatabaseUser> {
             email = it.baseUserInfo.email,
             isActive = it.baseUserInfo.isActive,
             age = it.age,
-            eyeColor = when (it.eyeColor) {
+            eyeColor = COLORS.getOrDefault(it.eyeColor, "no data") //todo обратное преобразование мапы?
+            when (it.eyeColor) {
                 R.color.user_eye_color_brown -> "brown"
                 R.color.user_eye_color_blue -> "blue"
                 R.color.user_eye_color_green -> "green"
