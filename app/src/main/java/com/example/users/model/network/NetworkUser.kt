@@ -65,7 +65,7 @@ fun List<NetworkUser>.asDomainModel(): List<FullUserInfo> {
             favoriteFruit = FRUITS.getOrDefault(it.favoriteFruit, R.string.user_fav_fruit_unknown),
             registeredDate = reformatDate(it.registered),
             location = FullUserInfo.Location(it.latitude, it.longitude),
-            friends = it.friends.map { it.id }.toSet()
+            friends = it.friends.map { friend -> friend.id }.toSet()
         )
     }
 }

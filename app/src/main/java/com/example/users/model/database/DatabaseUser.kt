@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 import com.example.users.R
 import com.example.users.model.domain.FullUserInfo
 import com.example.users.model.database.DatabaseUser.Companion.COLORS
+import com.example.users.model.database.DatabaseUser.Companion.DEFAULT_RECORD_FOR_UNKNOWN
 import com.example.users.model.database.DatabaseUser.Companion.FRUITS
 
 @Entity(tableName = "users")
@@ -39,7 +40,10 @@ data class DatabaseUser(
             phone = this.phone,
             address = this.address,
             about = this.about,
-            favoriteFruit = FRUITS.getOrDefault(this.favoriteFruit, R.string.user_fav_fruit_unknown),
+            favoriteFruit = FRUITS.getOrDefault(
+                this.favoriteFruit,
+                R.string.user_fav_fruit_unknown
+            ),
             registeredDate = this.registeredDate,
             location = this.location,
             friends = this.friends
@@ -56,10 +60,10 @@ data class DatabaseUser(
             "banana" to R.string.user_fav_fruit_banana,
             "strawberry" to R.string.user_fav_fruit_strawberry
         )
+        const val DEFAULT_RECORD_FOR_UNKNOWN = "no data"
     }
 }
 
-//todo строки в переменные, ебанутый!
 fun List<DatabaseUser>.asDomainModel(): List<FullUserInfo> {
     return map {
         it.asDomainModel()
@@ -74,23 +78,14 @@ fun List<FullUserInfo>.asDatabaseDTO(): List<DatabaseUser> {
             email = it.baseUserInfo.email,
             isActive = it.baseUserInfo.isActive,
             age = it.age,
-            eyeColor = COLORS.getOrDefault(it.eyeColor, "no data") //todo обратное преобразование мапы?
-            when (it.eyeColor) {
-                R.color.user_eye_color_brown -> "brown"
-                R.color.user_eye_color_blue -> "blue"
-                R.color.user_eye_color_green -> "green"
-                else -> "no data"
-            },
+            eyeColor = COLORS.entries.find { mapEnt -> mapEnt.value == it.eyeColor }?.key
+                ?: DEFAULT_RECORD_FOR_UNKNOWN,
             company = it.company,
             phone = it.phone,
             address = it.address,
             about = it.about,
-            favoriteFruit = when (it.favoriteFruit) {
-                R.string.user_fav_fruit_apple -> "apple"
-                R.string.user_fav_fruit_banana -> "banana"
-                R.string.user_fav_fruit_strawberry -> "strawberry"
-                else -> "unknown"
-            },
+            favoriteFruit = FRUITS.entries.find { mapEnt -> mapEnt.value == it.favoriteFruit }?.key
+                ?: DEFAULT_RECORD_FOR_UNKNOWN,
             registeredDate = it.registeredDate,
             location = it.location,
             friends = it.friends
