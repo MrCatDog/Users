@@ -8,6 +8,9 @@ import com.example.users.model.network.utils.ServerApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import retrofit2.HttpException
+import java.io.IOException
+import java.net.HttpURLConnection
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -50,7 +53,26 @@ class UserRepositoryImpl @Inject constructor(
             try {
                 ResultWrapper.Success(Call.invoke())
             } catch (throwable: Throwable) {
-                ResultWrapper.Failure(throwable)
+                when(throwable) {
+                    is IOException -> ResultWrapper.Failure(ErrorEntity.Network(throwable))
+                    is HttpException -> {
+                        when (throwable.code()) {
+                            // not found
+                            HttpURLConnection.HTTP_NOT_FOUND -> ResultWrapper.Failure(ErrorEntity.NotFound)
+
+                            // access denied
+                            HttpURLConnection.HTTP_FORBIDDEN -> ResultWrapper.Failure(ErrorEntity.AccessDenied)
+
+                            // unavailable service
+                            HttpURLConnection.HTTP_UNAVAILABLE -> ResultWrapper.Failure(ErrorEntity.ServiceUnavailable)
+
+                            // all the others will be treated as unknown error
+                            else -> ResultWrapper.Failure(ErrorEntity.Unknown)
+                        }
+                    }
+                    else -> ResultWrapper.Failure(ErrorEntity.Unknown)
+                    //ResultWrapper.Failure(throwable)
+                }
             }
         }
     }
@@ -58,5 +80,13 @@ class UserRepositoryImpl @Inject constructor(
 
 sealed class ResultWrapper<out T> {
     data class Success<out T>(val value: T) : ResultWrapper<T>()
-    data class Failure(val error: Throwable? = null) : ResultWrapper<Nothing>()
+    data class Failure(val error: ErrorEntity) : ResultWrapper<Nothing>() //todo больше ошибок подумать нужно ли этот всё тут
+}
+
+sealed class ErrorEntity(val error: Throwable? = null) {
+    object Network : ErrorEntity()
+    object NotFound : ErrorEntity()
+    object AccessDenied : ErrorEntity()
+    object ServiceUnavailable : ErrorEntity()
+    object Unknown : ErrorEntity()
 }
