@@ -83,7 +83,7 @@ class UserDetailsFragment : Fragment() {
         viewModel.errorText.observe(viewLifecycleOwner) {
             Snackbar.make(
                 binding.root,
-                it ?: getString(R.string.unknown_error_text),
+                it,
                 Snackbar.LENGTH_LONG
             ).show()
         }

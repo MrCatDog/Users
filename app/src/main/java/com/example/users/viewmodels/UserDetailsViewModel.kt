@@ -2,7 +2,9 @@ package com.example.users.viewmodels
 
 import android.net.Uri
 import androidx.lifecycle.*
+import com.example.users.R
 import com.example.users.model.domain.FullUserInfo
+import com.example.users.model.repository.ErrorEntity.*
 import com.example.users.model.repository.ResultWrapper
 import com.example.users.model.repository.UserRepository
 import com.example.users.utils.MutableLiveEvent
@@ -30,8 +32,8 @@ class UserDetailsViewModel @AssistedInject constructor(
     val friends: LiveData<List<FullUserInfo.BaseUserInfo>>
         get() = _friends
 
-    private val _error = MutableLiveEvent<String?>()
-    val errorText: LiveData<String?>
+    private val _error = MutableLiveEvent<Int>()
+    val errorText: LiveData<Int>
         get() = _error
 
     private val _navigateToUserDetails = MutableLiveEvent<Int>()
@@ -56,14 +58,33 @@ class UserDetailsViewModel @AssistedInject constructor(
                     _user.postValue(this)
                 }
             }
-            is ResultWrapper.Failure -> _error.postValue(answer.error?.message)
+            is ResultWrapper.Failure -> _error.postValue(
+                when (answer.error) {
+                    NETWORK -> R.string.network_error_text
+                    NOT_FOUND -> R.string.not_found_error_text
+                    ACCESS_DENIED -> R.string.access_denied_error_text
+                    SERVICE_UNAVAILABLE -> R.string.service_unavailable_error_text
+                    UNKNOWN -> R.string.unknown_error_text
+                }
+            )
         }
     }
 
     private suspend fun getFriends(friendsIdList: List<Int>) {
         when (val friendsAnswer = repository.loadBaseUsersInfoFromDB(friendsIdList)) {
             is ResultWrapper.Success -> _friends.postValue(friendsAnswer.value)
-            is ResultWrapper.Failure -> _error.postValue(friendsAnswer.error?.message)
+            is ResultWrapper.Failure -> {
+                _error.postValue(
+                    when (friendsAnswer.error) {
+                        NETWORK -> R.string.network_error_text
+                        NOT_FOUND -> R.string.not_found_error_text
+                        ACCESS_DENIED -> R.string.access_denied_error_text
+                        SERVICE_UNAVAILABLE -> R.string.service_unavailable_error_text
+                        UNKNOWN -> R.string.unknown_error_text
+                    }
+                )
+                //_error.postValue(friendsAnswer.error?.message)
+            }
         }
     }
 

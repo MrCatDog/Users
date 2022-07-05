@@ -54,23 +54,23 @@ class UserRepositoryImpl @Inject constructor(
                 ResultWrapper.Success(Call.invoke())
             } catch (throwable: Throwable) {
                 when(throwable) {
-                    is IOException -> ResultWrapper.Failure(ErrorEntity.Network(throwable))
+                    is IOException -> ResultWrapper.Failure(ErrorEntity.NETWORK)
                     is HttpException -> {
                         when (throwable.code()) {
                             // not found
-                            HttpURLConnection.HTTP_NOT_FOUND -> ResultWrapper.Failure(ErrorEntity.NotFound)
+                            HttpURLConnection.HTTP_NOT_FOUND -> ResultWrapper.Failure(ErrorEntity.NOT_FOUND)
 
                             // access denied
-                            HttpURLConnection.HTTP_FORBIDDEN -> ResultWrapper.Failure(ErrorEntity.AccessDenied)
+                            HttpURLConnection.HTTP_FORBIDDEN -> ResultWrapper.Failure(ErrorEntity.ACCESS_DENIED)
 
                             // unavailable service
-                            HttpURLConnection.HTTP_UNAVAILABLE -> ResultWrapper.Failure(ErrorEntity.ServiceUnavailable)
+                            HttpURLConnection.HTTP_UNAVAILABLE -> ResultWrapper.Failure(ErrorEntity.SERVICE_UNAVAILABLE)
 
                             // all the others will be treated as unknown error
-                            else -> ResultWrapper.Failure(ErrorEntity.Unknown)
+                            else -> ResultWrapper.Failure(ErrorEntity.UNKNOWN)
                         }
                     }
-                    else -> ResultWrapper.Failure(ErrorEntity.Unknown)
+                    else -> ResultWrapper.Failure(ErrorEntity.UNKNOWN)
                     //ResultWrapper.Failure(throwable)
                 }
             }
@@ -83,10 +83,10 @@ sealed class ResultWrapper<out T> {
     data class Failure(val error: ErrorEntity) : ResultWrapper<Nothing>() //todo больше ошибок подумать нужно ли этот всё тут
 }
 
-sealed class ErrorEntity(val error: Throwable? = null) {
-    object Network : ErrorEntity()
-    object NotFound : ErrorEntity()
-    object AccessDenied : ErrorEntity()
-    object ServiceUnavailable : ErrorEntity()
-    object Unknown : ErrorEntity()
+enum class ErrorEntity{
+    NETWORK,
+    NOT_FOUND,
+    ACCESS_DENIED,
+    SERVICE_UNAVAILABLE,
+    UNKNOWN
 }
