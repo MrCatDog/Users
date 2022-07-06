@@ -71,7 +71,6 @@ class UserRepositoryImpl @Inject constructor(
                         }
                     }
                     else -> ResultWrapper.Failure(ErrorEntity.UNKNOWN)
-                    //ResultWrapper.Failure(throwable)
                 }
             }
         }
@@ -90,3 +89,18 @@ enum class ErrorEntity{
     SERVICE_UNAVAILABLE,
     UNKNOWN
 }
+
+//todo: мать твою, шо там за ошибки может вернуть база? и теперь нужно это явно выносить
+//sealed class ErrorEntity2 {
+//    sealed class ApiError : ErrorEntity2() {
+//        object Network : ApiError()
+//        object NotFound : ApiError()
+//        object AccessDenied : ApiError()
+//        object ServiceUnavailable : ApiError()
+//        object Unknown : ApiError()
+//    }
+//
+//    sealed class DBError : ErrorEntity2() {
+//        object
+//    }
+//}

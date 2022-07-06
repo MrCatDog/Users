@@ -11,13 +11,17 @@ import javax.inject.Singleton
 @Module
 class StorageModule {
 
+    companion object {
+        const val databaseName = "user_database"
+    }
+
     @Singleton
     @Provides
     fun provideDatabase(context: Context): UserDatabase =
         Room.databaseBuilder(
             context.applicationContext,
             UserDatabase::class.java,
-            "user_database"
+            databaseName
         ).build()
 
     @Singleton

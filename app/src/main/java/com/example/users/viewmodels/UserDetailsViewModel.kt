@@ -72,7 +72,7 @@ class UserDetailsViewModel @AssistedInject constructor(
 
     private suspend fun getFriends(friendsIdList: List<Int>) {
         when (val friendsAnswer = repository.loadBaseUsersInfoFromDB(friendsIdList)) {
-            is ResultWrapper.Success -> _friends.postValue(friendsAnswer.value)
+            is ResultWrapper.Success -> this._friends.postValue(friendsAnswer.value) //"this" required because of old lint bag
             is ResultWrapper.Failure -> {
                 _error.postValue(
                     when (friendsAnswer.error) {
@@ -83,7 +83,6 @@ class UserDetailsViewModel @AssistedInject constructor(
                         UNKNOWN -> R.string.unknown_error_text
                     }
                 )
-                //_error.postValue(friendsAnswer.error?.message)
             }
         }
     }

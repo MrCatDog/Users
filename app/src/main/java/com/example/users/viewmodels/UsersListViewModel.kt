@@ -53,10 +53,10 @@ class UsersListViewModel
 
     private suspend fun getUsersFromDB() {
         when (val answer = repository.loadBaseUsersInfoFromDB()) {
-            is ResultWrapper.Success -> _users.postValue(answer.value)
+            is ResultWrapper.Success -> this._users.postValue(answer.value) //"this" required because of old lint bag
             is ResultWrapper.Failure -> _error.postValue(
                 when (answer.error) {
-                    ErrorEntity.NETWORK -> R.string.network_error_text
+                    ErrorEntity.NETWORK -> R.string.network_error_text //todo угу, ебать, ошибка сети от БД
                     ErrorEntity.NOT_FOUND -> R.string.not_found_error_text
                     ErrorEntity.ACCESS_DENIED -> R.string.access_denied_error_text
                     ErrorEntity.SERVICE_UNAVAILABLE -> R.string.service_unavailable_error_text

@@ -24,6 +24,7 @@ data class DatabaseUser(
     val favoriteFruit: String,
     val registeredDate: String,
     @Embedded val location: FullUserInfo.Location,
+    //todo: relation annotation
     val friends: Set<Int>
 ) {
     fun asDomainModel(): FullUserInfo =
@@ -64,12 +65,6 @@ data class DatabaseUser(
     }
 }
 
-fun List<DatabaseUser>.asDomainModel(): List<FullUserInfo> {
-    return map {
-        it.asDomainModel()
-    }
-}
-
 fun List<FullUserInfo>.asDatabaseDTO(): List<DatabaseUser> {
     return map {
         DatabaseUser(
@@ -90,11 +85,5 @@ fun List<FullUserInfo>.asDatabaseDTO(): List<DatabaseUser> {
             location = it.location,
             friends = it.friends
         )
-    }
-}
-
-fun List<FullUserInfo>.asBaseInfoList(): List<FullUserInfo.BaseUserInfo> {
-    return map {
-        it.baseUserInfo
     }
 }

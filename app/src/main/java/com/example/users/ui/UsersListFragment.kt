@@ -73,19 +73,17 @@ class UsersListFragment : Fragment() {
 
         viewModel.navigateToUserDetails.observe(viewLifecycleOwner) {
             findNavController().navigate(
-                UsersListFragmentDirections.actionUsersListFragmentToUserDetailsFragment(
-                    it
-                )
+                UsersListFragmentDirections.actionUsersListFragmentToUserDetailsFragment(it)
             )
-        }
-
-        binding.refreshBtn.setOnClickListener {
-            viewModel.refreshBtnClicked()
         }
 
         viewModel.isFirstLoaded.observe(viewLifecycleOwner) {
             PreferenceManager.getDefaultSharedPreferences(requireContext()).edit()
                 .putBoolean(firstTimeLoadingSharedTag, it).apply()
+        }
+
+        binding.refreshBtn.setOnClickListener {
+            viewModel.refreshBtnClicked()
         }
 
         return binding.root
