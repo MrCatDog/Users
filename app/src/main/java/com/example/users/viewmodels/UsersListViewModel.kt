@@ -12,6 +12,8 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.example.users.model.repository.ErrorEntity.ApiError.*
+import com.example.users.model.repository.ErrorEntity.DBError.*
 
 class UsersListViewModel
 @AssistedInject constructor(
@@ -54,15 +56,7 @@ class UsersListViewModel
     private suspend fun getUsersFromDB() {
         when (val answer = repository.loadBaseUsersInfoFromDB()) {
             is ResultWrapper.Success -> this._users.postValue(answer.value) //"this" required because of old lint bag
-            is ResultWrapper.Failure -> _error.postValue(
-                when (answer.error) {
-                    ErrorEntity.NETWORK -> R.string.network_error_text //todo угу, ебать, ошибка сети от БД
-                    ErrorEntity.NOT_FOUND -> R.string.not_found_error_text
-                    ErrorEntity.ACCESS_DENIED -> R.string.access_denied_error_text
-                    ErrorEntity.SERVICE_UNAVAILABLE -> R.string.service_unavailable_error_text
-                    ErrorEntity.UNKNOWN -> R.string.unknown_error_text
-                }
-            )
+            is ResultWrapper.Failure -> _error.postValue(handleError(answer.error))
         }
     }
 
@@ -74,17 +68,25 @@ class UsersListViewModel
                 false
             }
             is ResultWrapper.Failure -> {
-                _error.postValue(
-                    when (answer.error) {
-                        ErrorEntity.NETWORK -> R.string.network_error_text
-                        ErrorEntity.NOT_FOUND -> R.string.not_found_error_text
-                        ErrorEntity.ACCESS_DENIED -> R.string.access_denied_error_text
-                        ErrorEntity.SERVICE_UNAVAILABLE -> R.string.service_unavailable_error_text
-                        ErrorEntity.UNKNOWN -> R.string.unknown_error_text
-                    }
-                )
+                _error.postValue(handleError(answer.error))
                 true
             }
+        }
+    }
+
+    private fun handleError(error: ErrorEntity): Int {
+        return when (error) {
+            is ErrorEntity.ApiError -> when (error) {
+                Network -> R.string.network_error_text
+                NotFound -> R.string.not_found_error_text
+                AccessDenied -> R.string.access_denied_error_text
+                ServiceUnavailable -> R.string.service_unavailable_error_text
+            }
+            is ErrorEntity.DBError -> when (error) {
+                NoPermission -> R.string.no_permission_error_text
+                Common -> R.string.common_db_error_text
+            }
+            is ErrorEntity.UnknownError -> R.string.unknown_error_text
         }
     }
 

@@ -25,4 +25,6 @@
     <string name="not_found_error_text">Data not found! Contact with developers.</string>
     <string name="access_denied_error_text">Access error! Contact with developers.</string>
     <string name="service_unavailable_error_text">Server error! Try again later.</string>
+    <string name="no_permission_error_text">App need permisson to work with storage</string>
+    <string name="common_db_error_text">Data Base error, please, contact with developer</string>
 </resources>

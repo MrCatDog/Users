@@ -1,6 +1,7 @@
 package com.example.users.utils.di
 
 import com.example.users.model.network.utils.ServerApi
+import com.example.users.model.repository.errorhandlers.NetworkErrorHandler
 import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit
@@ -28,4 +29,7 @@ class RemoteModule {
     @Singleton
     @Provides
     fun provideServerApi(retrofit: Retrofit): ServerApi = retrofit.create(ServerApi::class.java)
+
+    @Provides
+    fun provideNetworkErrorHandler(): NetworkErrorHandler = NetworkErrorHandler()
 }

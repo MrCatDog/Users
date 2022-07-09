@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.users.model.database.utils.UserDao
 import com.example.users.model.database.utils.UserDatabase
+import com.example.users.model.repository.errorhandlers.DBErrorHandler
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -29,4 +30,7 @@ class StorageModule {
     fun providePersonDao(db: UserDatabase): UserDao {
         return db.userDao()
     }
+
+    @Provides
+    fun provideDBErrorHandler(): DBErrorHandler = DBErrorHandler()
 }
