@@ -3,6 +3,7 @@ package com.example.users.model.database
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.Relation
 import com.example.users.R
 import com.example.users.model.domain.FullUserInfo
 import com.example.users.model.database.DatabaseUser.Companion.COLORS
@@ -12,9 +13,7 @@ import com.example.users.model.database.DatabaseUser.Companion.FRUITS
 @Entity(tableName = "users")
 data class DatabaseUser(
     @PrimaryKey val id: Int,
-    val name: String,
-    val email: String,
-    val isActive: Boolean,
+    @Embedded val baseUserInfo: BaseUserInfo,
     val age: Int,
     val eyeColor: String,
     val company: String,
@@ -25,15 +24,18 @@ data class DatabaseUser(
     val registeredDate: String,
     @Embedded val location: FullUserInfo.Location,
     //todo: relation annotation
-    val friends: Set<Int>
+    @Relation(parentColumn = "id", entityColumn = "id")
+    val friends: Set<BaseUserInfo>
 ) {
+    data class BaseUserInfo(val name: String, val email: String, val isActive: Boolean)
+
     fun asDomainModel(): FullUserInfo =
         FullUserInfo(
             baseUserInfo = FullUserInfo.BaseUserInfo(
                 id = this.id,
-                name = this.name,
-                email = this.email,
-                isActive = this.isActive
+                name = this.baseUserInfo.name,
+                email = this.baseUserInfo.email,
+                isActive = this.baseUserInfo.isActive
             ),
             age = this.age,
             eyeColor = COLORS.getOrDefault(this.eyeColor, R.color.white),
@@ -47,7 +49,14 @@ data class DatabaseUser(
             ),
             registeredDate = this.registeredDate,
             location = this.location,
-            friends = this.friends
+            friends = this.friends.map {
+                FullUserInfo.BaseUserInfo(
+                    id = this.id,
+                    name = it.name,
+                    email = it.email,
+                    isActive = it.isActive
+                )
+            }.toSet()
         )
 
     companion object {
@@ -69,9 +78,11 @@ fun List<FullUserInfo>.asDatabaseDTO(): List<DatabaseUser> {
     return map {
         DatabaseUser(
             id = it.baseUserInfo.id,
-            name = it.baseUserInfo.name,
-            email = it.baseUserInfo.email,
-            isActive = it.baseUserInfo.isActive,
+            baseUserInfo = DatabaseUser.BaseUserInfo(
+                name = it.baseUserInfo.name,
+                email = it.baseUserInfo.email,
+                isActive = it.baseUserInfo.isActive
+            ),
             age = it.age,
             eyeColor = COLORS.entries.find { mapEnt -> mapEnt.value == it.eyeColor }?.key
                 ?: DEFAULT_RECORD_FOR_UNKNOWN,
@@ -83,7 +94,13 @@ fun List<FullUserInfo>.asDatabaseDTO(): List<DatabaseUser> {
                 ?: DEFAULT_RECORD_FOR_UNKNOWN,
             registeredDate = it.registeredDate,
             location = it.location,
-            friends = it.friends
+            friends = it.friends.map { domainBase ->
+                DatabaseUser.BaseUserInfo(
+                    name = domainBase.name,
+                    email = domainBase.email,
+                    isActive = domainBase.isActive
+                )
+            }.toSet()
         )
     }
 }

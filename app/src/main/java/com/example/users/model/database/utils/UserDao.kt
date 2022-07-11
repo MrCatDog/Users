@@ -1,9 +1,6 @@
 package com.example.users.model.database.utils
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.example.users.model.database.DatabaseUser
 import com.example.users.model.domain.FullUserInfo
 
@@ -22,6 +19,7 @@ interface UserDao {
     @Query("SELECT id, name, email, isActive FROM users")
     fun getAllBaseInfo() : List<FullUserInfo.BaseUserInfo>
 
+    @Transaction
     @Query("SELECT * FROM users WHERE id = :userId")
     fun getUserFullInfo(userId : Int) : DatabaseUser
 
