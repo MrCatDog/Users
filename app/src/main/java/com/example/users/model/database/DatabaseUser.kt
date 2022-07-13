@@ -25,7 +25,7 @@ data class DatabaseUser(
     @Embedded val location: FullUserInfo.Location,
     //todo: relation annotation
     @Relation(parentColumn = "id", entityColumn = "id")
-    val friends: Set<BaseUserInfo>
+    val friends: Set<Int>
 ) {
     data class BaseUserInfo(val name: String, val email: String, val isActive: Boolean)
 
@@ -104,3 +104,15 @@ fun List<FullUserInfo>.asDatabaseDTO(): List<DatabaseUser> {
         )
     }
 }
+
+data class UserWithFriends (
+    @Embedded
+    val user: DatabaseUser,
+    @Relation(
+        entity = DatabaseUser::class,
+        parentColumn = "friends",
+        entityColumn = "id",
+        projection = ["id", "name", "email", "isActive"]
+    )
+    val friends: Set<FullUserInfo.BaseUserInfo>
+)
