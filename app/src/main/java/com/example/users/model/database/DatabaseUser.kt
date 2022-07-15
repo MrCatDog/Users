@@ -13,7 +13,9 @@ import com.example.users.model.database.DatabaseUser.Companion.FRUITS
 @Entity(tableName = "users")
 data class DatabaseUser(
     @PrimaryKey val id: Int,
-    @Embedded val baseUserInfo: BaseUserInfo,
+    val name: String,
+    val email: String,
+    val isActive: Boolean,
     val age: Int,
     val eyeColor: String,
     val company: String,
@@ -24,18 +26,15 @@ data class DatabaseUser(
     val registeredDate: String,
     @Embedded val location: FullUserInfo.Location,
     //todo: relation annotation
-    @Relation(parentColumn = "id", entityColumn = "id")
     val friends: Set<Int>
 ) {
-    data class BaseUserInfo(val name: String, val email: String, val isActive: Boolean)
-
     fun asDomainModel(): FullUserInfo =
         FullUserInfo(
             baseUserInfo = FullUserInfo.BaseUserInfo(
                 id = this.id,
-                name = this.baseUserInfo.name,
-                email = this.baseUserInfo.email,
-                isActive = this.baseUserInfo.isActive
+                name = this.name,
+                email = this.email,
+                isActive = this.isActive
             ),
             age = this.age,
             eyeColor = COLORS.getOrDefault(this.eyeColor, R.color.white),
@@ -78,11 +77,9 @@ fun List<FullUserInfo>.asDatabaseDTO(): List<DatabaseUser> {
     return map {
         DatabaseUser(
             id = it.baseUserInfo.id,
-            baseUserInfo = DatabaseUser.BaseUserInfo(
-                name = it.baseUserInfo.name,
-                email = it.baseUserInfo.email,
-                isActive = it.baseUserInfo.isActive
-            ),
+            name = it.baseUserInfo.name,
+            email = it.baseUserInfo.email,
+            isActive = it.baseUserInfo.isActive,
             age = it.age,
             eyeColor = COLORS.entries.find { mapEnt -> mapEnt.value == it.eyeColor }?.key
                 ?: DEFAULT_RECORD_FOR_UNKNOWN,
@@ -105,7 +102,7 @@ fun List<FullUserInfo>.asDatabaseDTO(): List<DatabaseUser> {
     }
 }
 
-data class UserWithFriends (
+data class UserWithFriends(
     @Embedded
     val user: DatabaseUser,
     @Relation(
