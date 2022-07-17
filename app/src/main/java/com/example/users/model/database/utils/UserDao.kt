@@ -1,13 +1,14 @@
 package com.example.users.model.database.utils
 
 import androidx.room.*
+import com.example.users.model.database.DBUserWithFriends
 import com.example.users.model.database.DatabaseUser
 import com.example.users.model.domain.FullUserInfo
 
 @Dao
 interface UserDao {
-    @Query("SELECT * FROM users")
-    fun getAll(): List<DatabaseUser>
+//    @Query("SELECT * FROM users")
+//    fun getAll(): List<DatabaseUser>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(users: List<DatabaseUser>)
@@ -21,9 +22,9 @@ interface UserDao {
 
     @Transaction
     @Query("SELECT * FROM users WHERE id = :userId")
-    fun getUserFullInfo(userId : Int) : DatabaseUser
+    fun getUserFullInfo(userId : Int) : DBUserWithFriends
 
-    @Query("SELECT id, name, email, isActive FROM users WHERE id IN (:usersId)")
-    fun getUsersBaseInfoById(usersId: List<Int>) : List<FullUserInfo.BaseUserInfo>
+//    @Query("SELECT id, name, email, isActive FROM users WHERE id IN (:usersId)")
+//    fun getUsersBaseInfoById(usersId: List<Int>) : List<FullUserInfo.BaseUserInfo>
 
 }
