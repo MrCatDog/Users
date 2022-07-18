@@ -23,17 +23,11 @@ class UserRepositoryImpl @Inject constructor(
 ) : UserRepository {
 
     override suspend fun loadBaseUsersInfoFromDB(idList: List<Int>) : ResultWrapper<List<FullUserInfo.BaseUserInfo>> {
-        return safeCall(Dispatchers.IO, DBErrorHandler) {
-            if (idList.isEmpty()) {
-                database.getAllBaseInfo()
-            } else {
-                database.getUsersBaseInfoById(idList)
-            }
-        }
+        return safeCall(Dispatchers.IO, DBErrorHandler) {database.getAllBaseInfo()}
     }
 
     override suspend fun loadUserDetails(id: Int) : ResultWrapper<FullUserInfo> {
-        return safeCall(Dispatchers.IO, DBErrorHandler) { database.getUserFullInfo(id).asDomainModel() }
+        return safeCall(Dispatchers.IO, DBErrorHandler) { database.getUserFullInfo(id).asDomainUser() }
     }
 
     override suspend fun loadUsersFromNetwork() : ResultWrapper<List<FullUserInfo>> {
