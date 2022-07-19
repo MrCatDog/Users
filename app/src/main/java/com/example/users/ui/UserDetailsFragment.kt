@@ -50,10 +50,6 @@ class UserDetailsFragment : Fragment() {
             addItemDecoration(getDividerItemDecoration(linearLayoutManager))
         }
 
-        viewModel.friends.observe(viewLifecycleOwner) {
-            recyclerAdapter.setData(it)
-        }
-
         viewModel.user.observe(viewLifecycleOwner) { user ->
             binding.apply {
                 userName.text = user.baseUserInfo.name
@@ -77,6 +73,7 @@ class UserDetailsFragment : Fragment() {
                 binding.userLatLon.setOnClickListener {
                     viewModel.userAddressClicked(user.location)
                 }
+                recyclerAdapter.setData(user.friends.toList()) //todo: Set -> List не тут должен быть
             }
         }
 

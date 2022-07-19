@@ -59,7 +59,7 @@ class UserDetailsViewModel @AssistedInject constructor(
                 answer.value.apply {
                     //getFriends(this.friends.toList())
                     _user.postValue(this)
-                    _friends.postValue(this.friends.toList())
+                    _friends.postValue(this.friends.toList()) //todo List пустой
                 }
             }
             is ResultWrapper.Failure -> _error.postValue(handleError(answer.error))
