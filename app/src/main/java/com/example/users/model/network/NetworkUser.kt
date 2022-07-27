@@ -48,14 +48,6 @@ data class NetworkUser(
 }
 
 fun List<NetworkUser>.asDomainModel(): List<FullUserInfo> {
-    val usersBaseInfo = this.map { friend ->
-        FullUserInfo.BaseUserInfo(
-            friend.id,
-            friend.name,
-            friend.email,
-            friend.isActive
-        )
-    }.toSet()
     return map {
         FullUserInfo(
             baseUserInfo = FullUserInfo.BaseUserInfo(
@@ -73,10 +65,7 @@ fun List<NetworkUser>.asDomainModel(): List<FullUserInfo> {
             favoriteFruit = FRUITS.getOrDefault(it.favoriteFruit, R.string.user_fav_fruit_unknown),
             registeredDate = reformatDate(it.registered),
             location = FullUserInfo.Location(it.latitude, it.longitude),
-            friends = usersBaseInfo.filter { possibleFriend ->
-                val friendsIds = it.friends.map { friend -> friend.id }.toSet()
-                friendsIds.contains(possibleFriend.id)
-            }.toSet()
+            friends = it.friends.map { friend -> friend.id }.toSet()
         )
     }
 }

@@ -11,7 +11,7 @@ data class FullUserInfo(
     val favoriteFruit: Int,
     val registeredDate: String,
     val location: Location,
-    val friends: Set<BaseUserInfo>
+    val friends: Set<Int>
 ) {
     data class BaseUserInfo(
         val id: Int,

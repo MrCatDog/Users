@@ -57,9 +57,8 @@ class UserDetailsViewModel @AssistedInject constructor(
         when (val answer = repository.loadUserDetails(userId)) {
             is ResultWrapper.Success -> {
                 answer.value.apply {
-                    //getFriends(this.friends.toList())
+                    getFriends(this.friends.toList())
                     _user.postValue(this)
-                    _friends.postValue(this.friends.toList()) //todo List пустой
                 }
             }
             is ResultWrapper.Failure -> _error.postValue(handleError(answer.error))
