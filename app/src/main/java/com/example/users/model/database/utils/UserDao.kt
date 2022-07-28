@@ -12,7 +12,7 @@ interface UserDao {
     @Query("DELETE FROM users")
     fun cleanTable()
 
-    //todo FullUserInfo.BaseUserInfo не DTO. И не похеру ли?
+    //FullUserInfo.BaseUserInfo не DTO. И не похеру ли?
     @Query("SELECT id, name, email, isActive FROM users")
     fun getAllBaseInfo() : List<FullUserInfo.BaseUserInfo>
 

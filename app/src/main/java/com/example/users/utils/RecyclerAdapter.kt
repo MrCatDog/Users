@@ -29,7 +29,6 @@ class RecyclerAdapter(private val listener: (BaseUserInfo) -> Unit) : RecyclerVi
         holder.binding.usersListName.text = item.name
         holder.binding.usersListEmail.text = item.email
 
-        //todo DataBinding?
         holder.binding.usersListActive.apply {
             val context = holder.itemView.context
             text = if(item.isActive) {

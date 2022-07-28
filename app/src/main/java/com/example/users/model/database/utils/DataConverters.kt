@@ -6,7 +6,7 @@ import com.google.gson.reflect.TypeToken
 
 class DataConverters {
 
-    private val gson = Gson() //todo DI же надо
+    private val gson = Gson()
 
     @TypeConverter
     fun fromFriendsIdSet(value: Set<Int>): String {
