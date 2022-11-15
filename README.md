@@ -5,8 +5,7 @@ show detailed info about users which including friend list with transition betwe
 open third-party mail/phone/map app by tap on appropriate user data.
 
 # Demonstration
-[baseUsers.webm](https://user-images.githubusercontent.com/44441893/202003878-783d66cc-7a1a-4888-ae1c-09cfcb81ed08.webm)
-
+![baseUsers](https://user-images.githubusercontent.com/44441893/202007496-c25bded8-745a-4e59-a7fd-96ac30782bfe.gif)
 
 # Tech stack
 Dagger2, Retrofit, Room, Navigation, MVVM, Repository pattern.
