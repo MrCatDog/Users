@@ -12,8 +12,12 @@ import javax.inject.Singleton
 class RemoteModule {
 
     companion object {
-        const val baseUrl = "https://firebasestorage.googleapis.com"
+        const val baseUrl = "https://firebasestorage.googleapis.com" //todo это точно тут должно быть?
     }
+
+    @Singleton
+    @Provides
+    fun provideGson(): GsonConverterFactory = GsonConverterFactory.create()
 
     @Singleton
     @Provides
@@ -22,9 +26,7 @@ class RemoteModule {
         .addConverterFactory(gson)
         .build()
 
-    @Singleton
-    @Provides
-    fun provideGson(): GsonConverterFactory = GsonConverterFactory.create()
+
 
     @Singleton
     @Provides
