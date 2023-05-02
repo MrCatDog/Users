@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
         setContent {
             val navController = rememberNavController()
             NavHost(navController = navController, startDestination = "usersList") {
-                composable("usersList") { UsersList { userId: Int -> navController.navigate("profile/$userId") } }
+                composable("usersList") { MainUsersList { userId: Int -> navController.navigate("profile/$userId") } }
                 composable(
                     "profile/{userId}",
                     arguments = listOf(navArgument("userId") { type = NavType.IntType })
@@ -55,13 +55,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     @Composable
-    fun UsersList(onNavigateToProfile: (Int) -> Unit) {
+    fun MainUsersList(onNavigateToProfile: (Int) -> Unit) {
         // State
         val users = viewModel.users.observeAsState()
 
-        //        LaunchedEffect(key1 = Unit) {
-//            viewModel.fetchBooks()
-//        }
+        LaunchedEffect(Unit) {
+            viewModel.getUsersList()
+        }
 
         LazyColumn {
             if (users.value != null) {
@@ -73,9 +73,42 @@ class MainActivity : AppCompatActivity() {
     }
 
     @Composable
+    fun UserProfile(userId: Int, onNavigateToProfile: (Int) -> Unit) {
+
+        val user = viewModel.user.observeAsState().value
+        val friends = viewModel.friends.observeAsState()
+
+        LaunchedEffect(Unit) {
+            viewModel.getUserInfo(userId)
+        }
+
+        if (user != null) {
+            Column() {
+                Row {
+                    Text(text = user.baseUserInfo.name)
+                    Text(text = stringResource(id = R.string.user_age_precurse))
+                    Text(text = user.age.toString())
+                }
+
+                LazyColumn {
+                    if (friends.value != null) {
+                        items(friends.value!!) { user ->
+                            UserListItem(user, onNavigateToProfile)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
     fun UserListItem(user: FullUserInfo.BaseUserInfo, onNavigateToProfile: (Int) -> Unit) {
         Column(
-            modifier = Modifier.clickable { onNavigateToProfile(user.id) }
+            modifier = Modifier.clickable {
+                if (user.isActive) {
+                    onNavigateToProfile(user.id)
+                }
+            }
         ) {
             Text(user.name)
             Text(user.email)
@@ -91,27 +124,5 @@ class MainActivity : AppCompatActivity() {
                 )
             }
         }
-    }
-
-    @Composable
-    fun UserProfile(userId: Int, onNavigateToProfile: (Int) -> Unit) {
-
-        val user = viewModel.user.observeAsState().value
-
-        LaunchedEffect(Unit) {
-            viewModel.getUserInfo(userId)
-        }
-
-        if (user != null) {
-            Column() {
-                Row {
-                    Text(text = user.baseUserInfo.name)
-                    Text(text = stringResource(id = R.string.user_age_precurse))
-                    Text(text = user.age.toString())
-                }
-                UsersList(onNavigateToProfile)
-            }
-        }
-
     }
 }

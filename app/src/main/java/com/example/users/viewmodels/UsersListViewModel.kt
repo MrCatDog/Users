@@ -27,6 +27,10 @@ class UsersListViewModel
     val users: LiveData<List<BaseUserInfo>>
         get() = _users
 
+    private val _friends = MutableLiveData<List<BaseUserInfo>>()
+    val friends: LiveData<List<BaseUserInfo>>
+        get() = _friends
+
     private val _error = MutableLiveEvent<Int>()
     val error: LiveData<Int>
         get() = _error
@@ -47,7 +51,7 @@ class UsersListViewModel
     val user: LiveData<FullUserInfo>
         get() = _user
 
-    init {
+    fun getUsersList() {
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.postValue(true)
             if (firstTimeLoading) {
@@ -59,7 +63,6 @@ class UsersListViewModel
         }
     }
 
-    //todo вызвать это из компоуза! чтобы проверил первая загрузка или нет и загрузил полный список юзеров!
     private suspend fun getUsersFromDB() {
         when (val answer = repository.loadBaseUsersInfoFromDB()) {
             is ResultWrapper.Success -> this._users.postValue(answer.value) //"this" required because of old lint bag
@@ -131,7 +134,7 @@ class UsersListViewModel
 
     private suspend fun getFriends(friendsIdList: List<Int>) {
         when (val friendsAnswer = repository.loadBaseUsersInfoFromDB(friendsIdList)) {
-            is ResultWrapper.Success -> this._users.postValue(friendsAnswer.value) //"this" required because of old lint bag
+            is ResultWrapper.Success -> this._friends.postValue(friendsAnswer.value) //"this" required because of old lint bag
             is ResultWrapper.Failure -> _error.postValue(handleError(friendsAnswer.error))
         }
     }

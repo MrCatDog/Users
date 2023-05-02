@@ -296,5 +296,4 @@
     <orderEntry type="library" scope="TEST" name="Gradle: androidx.compose.material:material-ripple:1.4.0@aar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: androidx.compose.runtime:runtime-livedata:1.4.2@aar" level="project" />
   </component>
-  <component name="TestModuleProperties" production-module="Users.app.main" />
 </module>
